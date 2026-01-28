@@ -21,7 +21,7 @@ type SQLiteDBColumnType = 'INTEGER' | 'REAL' | 'TEXT' | 'BLOB';
 /**
  * Schema of a table.
  */
-export type SQLiteDBTableSchema = {
+export interface SQLiteDBTableSchema {
     /**
      * The table name.
      */
@@ -51,12 +51,12 @@ export type SQLiteDBTableSchema = {
      * Check constraint for the table.
      */
     tableCheck?: string;
-};
+}
 
 /**
  * Schema of a column.
  */
-export type SQLiteDBColumnSchema = {
+export interface SQLiteDBColumnSchema {
     /**
      * Column's name.
      */
@@ -96,12 +96,12 @@ export type SQLiteDBColumnSchema = {
      * Default value for the column.
      */
     default?: string;
-};
+}
 
 /**
  * Schema of a foreign key.
  */
-export type SQLiteDBForeignKeySchema = {
+export interface SQLiteDBForeignKeySchema {
     /**
      * Columns to include in this foreign key.
      */
@@ -121,7 +121,7 @@ export type SQLiteDBForeignKeySchema = {
      * Text with the actions to apply to the foreign key.
      */
     actions?: string;
-};
+}
 
 /**
  * Class to interact with the local database.
@@ -297,9 +297,9 @@ export class SQLiteDB {
      */
     async countRecordsSelect(
         table: string,
-        select = '',
+        select: string = '',
         params?: SQLiteDBRecordValue[],
-        countItem = 'COUNT(\'x\')',
+        countItem: string = 'COUNT(\'x\')',
     ): Promise<number> {
         if (select) {
             select = `WHERE ${select}`;
@@ -413,7 +413,7 @@ export class SQLiteDB {
      * @param params Array of sql parameters.
      * @returns Promise resolved with the number of affected rows.
      */
-    async deleteRecordsSelect(table: string, select = '', params?: SQLiteDBRecordValue[]): Promise<number> {
+    async deleteRecordsSelect(table: string, select: string = '', params?: SQLiteDBRecordValue[]): Promise<number> {
         if (select) {
             select = `WHERE ${select}`;
         }
@@ -507,7 +507,7 @@ export class SQLiteDB {
     async getFieldSelect(
         table: string,
         field: string,
-        select = '',
+        select: string = '',
         params?: SQLiteDBRecordValue[],
     ): Promise<SQLiteDBRecordValue> {
         if (select) {
@@ -550,7 +550,7 @@ export class SQLiteDB {
      * @param fields A comma separated list of fields to return.
      * @returns Promise resolved with the record, rejected if not found.
      */
-    getRecord<T = unknown>(table: string, conditions?: SQLiteDBRecordValues, fields = '*'): Promise<T> {
+    getRecord<T = unknown>(table: string, conditions?: SQLiteDBRecordValues, fields: string = '*'): Promise<T> {
         const selectAndParams = this.whereClause(conditions);
 
         return this.getRecordSelect<T>(table, selectAndParams.sql, selectAndParams.params, fields);
@@ -567,9 +567,9 @@ export class SQLiteDB {
      */
     getRecordSelect<T = unknown>(
         table: string,
-        select = '',
+        select: string = '',
         params: SQLiteDBRecordValue[] = [],
-        fields = '*',
+        fields: string = '*',
     ): Promise<T> {
         if (select) {
             select = ` WHERE ${select}`;
@@ -612,10 +612,10 @@ export class SQLiteDB {
     getRecords<T = unknown>(
         table: string,
         conditions?: SQLiteDBRecordValues,
-        sort = '',
-        fields = '*',
-        limitFrom = 0,
-        limitNum = 0,
+        sort: string = '',
+        fields: string = '*',
+        limitFrom: number = 0,
+        limitNum: number = 0,
     ): Promise<T[]> {
         const selectAndParams = this.whereClause(conditions);
 
@@ -638,10 +638,10 @@ export class SQLiteDB {
         table: string,
         field: string,
         values: SQLiteDBRecordValue[],
-        sort = '',
-        fields = '*',
-        limitFrom = 0,
-        limitNum = 0,
+        sort: string = '',
+        fields: string = '*',
+        limitFrom: number = 0,
+        limitNum: number = 0,
     ): Promise<T[]> {
         const selectAndParams = this.whereClauseList(field, values);
 
@@ -662,12 +662,12 @@ export class SQLiteDB {
      */
     getRecordsSelect<T = unknown>(
         table: string,
-        select = '',
+        select: string = '',
         params: SQLiteDBRecordValue[] = [],
-        sort = '',
-        fields = '*',
-        limitFrom = 0,
-        limitNum = 0,
+        sort: string = '',
+        fields: string = '*',
+        limitFrom: number = 0,
+        limitNum: number = 0,
     ): Promise<T[]> {
         if (select) {
             select = ` WHERE ${select}`;
@@ -887,7 +887,7 @@ export class SQLiteDB {
      * @param select A fragment of SQL to be used in a where clause in the SQL call.
      * @param params An array of sql parameters.
      */
-    async recordExistsSelect(table: string, select = '', params: SQLiteDBRecordValue[] = []): Promise<void> {
+    async recordExistsSelect(table: string, select: string = '', params: SQLiteDBRecordValue[] = []): Promise<void> {
         const record = await this.getRecordSelect(table, select, params);
         if (!record) {
             throw new CoreError('Record does not exist.');

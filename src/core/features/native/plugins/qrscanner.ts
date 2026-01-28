@@ -38,11 +38,7 @@ export class QRScanner {
     prepare(): Promise<QRScannerStatus> {
         return new Promise((resolve, reject) => {
             window.QRScanner.prepare((error: QRScannerError, status: QRScannerStatus) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(status);
-                }
+                error ? reject(error) : resolve(status);
             });
         });
     }
@@ -65,11 +61,7 @@ export class QRScanner {
     scan(): Observable<string> {
         return new Observable(observer => {
             window.QRScanner.scan((error: QRScannerError, text: string) => {
-                if (error) {
-                    observer.error(error);
-                } else {
-                    observer.next(text);
-                }
+                error ? observer.error(error) : observer.next(text);
             });
 
             return () => {
@@ -95,11 +87,7 @@ export class QRScanner {
     enableLight(): Promise<QRScannerStatus> {
         return new Promise((resolve, reject) => {
             window.QRScanner.enableLight((error: QRScannerError, status: QRScannerStatus) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(status);
-                }
+                error ? reject(error) : resolve(status);
             });
         });
     }
@@ -112,11 +100,7 @@ export class QRScanner {
     disableLight(): Promise<QRScannerStatus> {
         return new Promise((resolve, reject) => {
             window.QRScanner.disableLight((error: QRScannerError, status: QRScannerStatus) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(status);
-                }
+                error ? reject(error) : resolve(status);
             });
         });
     }
@@ -129,11 +113,7 @@ export class QRScanner {
     useFrontCamera(): Promise<QRScannerStatus> {
         return new Promise((resolve, reject) => {
             window.QRScanner.useFrontCamera((error: QRScannerError, status: QRScannerStatus) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(status);
-                }
+                error ? reject(error) : resolve(status);
             });
         });
     }
@@ -146,11 +126,7 @@ export class QRScanner {
     useBackCamera(): Promise<QRScannerStatus> {
         return new Promise((resolve, reject) => {
             window.QRScanner.useBackCamera((error: QRScannerError, status: QRScannerStatus) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(status);
-                }
+                error ? reject(error) : resolve(status);
             });
         });
     }
@@ -164,11 +140,7 @@ export class QRScanner {
     useCamera(camera: QRScannerCamera): Promise<QRScannerStatus> {
         return new Promise((resolve, reject) => {
             window.QRScanner.useCamera(camera, (error: QRScannerError, status: QRScannerStatus) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(status);
-                }
+                error ? reject(error) : resolve(status);
             });
         });
     }

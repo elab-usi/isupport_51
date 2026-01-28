@@ -28,7 +28,7 @@ import { Subscription } from 'rxjs';
 import { CoreFormatTextDirective } from './format-text';
 import { CoreWait } from '@singletons/wait';
 import { toBoolean } from '../transforms/boolean';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { CoreSplitViewComponent } from '@components/split-view/split-view';
 
 declare module '@singletons/events' {
@@ -146,7 +146,7 @@ export class CoreCollapsibleHeaderDirective implements OnInit, OnChanges, OnDest
     /**
      * @inheritdoc
      */
-    async ngOnChanges(changes: { [name: string]: SimpleChange }): Promise<void> {
+    async ngOnChanges(changes: {[name: string]: SimpleChange}): Promise<void> {
         if (changes.collapsible && !changes.collapsible.firstChange) {
             this.enabled = this.collapsible;
 

@@ -20,8 +20,6 @@ import { Translate } from '@singletons';
  */
 export class CoreCountries {
 
-    static readonly COUNTRIES_TRANSLATION_KEY_PREFIX = 'assets.countries.';
-
     // Avoid creating singleton instances.
     private constructor() {
         // Nothing to do.
@@ -34,7 +32,7 @@ export class CoreCountries {
      * @returns Country name. If the country is not found, return the country code.
      */
     static getCountryName(code: string): string {
-        const countryKey = `${CoreCountries.COUNTRIES_TRANSLATION_KEY_PREFIX}${code}`;
+        const countryKey = `assets.countries.${code}`;
         const countryName = Translate.instant(countryKey);
 
         return countryName !== countryKey ? countryName : code;
@@ -53,8 +51,8 @@ export class CoreCountries {
         const countries: Record<string, string> = {};
 
         keys.forEach((key) => {
-            if (key.startsWith(CoreCountries.COUNTRIES_TRANSLATION_KEY_PREFIX)) {
-                const code = key.replace(CoreCountries.COUNTRIES_TRANSLATION_KEY_PREFIX, '');
+            if (key.indexOf('assets.countries.') === 0) {
+                const code = key.replace('assets.countries.', '');
                 countries[code] = Translate.instant(key);
             }
         });
@@ -108,9 +106,17 @@ export class CoreCountries {
      * @returns Promise resolved with the countries list. Rejected if not translated.
      */
     protected static async getCountryKeysListForLanguage(lang: string): Promise<string[]> {
-        // Get the translation table for the countries.
-        const table = await CoreLang.getMessages(lang, CoreCountries.COUNTRIES_TRANSLATION_KEY_PREFIX);
-        const keys = Object.keys(table);
+        // Get the translation table for the language.
+        const table = await CoreLang.getTranslationTable(lang);
+
+        // Gather all the keys for countries,
+        const keys: string[] = [];
+
+        for (const name in table) {
+            if (name.indexOf('assets.countries.') === 0) {
+                keys.push(name);
+            }
+        }
 
         if (keys.length === 0) {
             // Not translated, reject.

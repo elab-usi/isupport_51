@@ -52,10 +52,14 @@ class behat_app extends behat_app_helper {
     protected $scenariolaststep;
 
     /**
-     * @BeforeScenario @app
+     * @BeforeScenario
      */
     public function before_scenario(ScenarioScope $scope) {
         $feature = $scope->getFeature();
+
+        if (!$feature->hasTag('app')) {
+            return;
+        }
 
         $steps = $scope->getScenario()->getSteps();
 
@@ -1179,6 +1183,18 @@ class behat_app extends behat_app_helper {
 
         $this->evaluate_script('window.close()');
         $this->getSession()->switchToWindow($names[0]);
+    }
+
+    /**
+     * Switch navigator online mode.
+     *
+     * @Given /^I switch offline mode to "(true|false)"$/
+     * @param string $offline New value for navigator online mode
+     * @throws DriverException If the navigator.online mode is not available
+     * @deprecated since 4.1 use i_switch_network_connection instead.
+     */
+    public function i_switch_offline_mode(string $offline) {
+        $this->i_switch_network_connection($offline == 'true' ? 'offline' : 'wifi');
     }
 
     /**

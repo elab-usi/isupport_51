@@ -66,7 +66,7 @@ export class CoreScreenService {
 
     protected breakpointsSubject: BehaviorSubject<Record<Breakpoint, boolean>>;
     private _layoutObservable: Observable<CoreScreenLayout>;
-    private readonly _orientationSignal = signal<CoreScreenOrientation>(CoreScreenOrientation.PORTRAIT);
+    private readonly _orientationSignal = signal<CoreScreenOrientation>(this.orientation);
 
     constructor() {
         this.breakpointsSubject = new BehaviorSubject(BREAKPOINT_NAMES.reduce((breakpoints, breakpoint) => ({
@@ -78,8 +78,6 @@ export class CoreScreenService {
             map(breakpoints => this.calculateLayout(breakpoints)),
             distinctUntilChanged<CoreScreenLayout>(),
         );
-
-        this.initializeOrientation();
     }
 
     get breakpoints(): Record<Breakpoint, boolean> {
@@ -107,12 +105,7 @@ export class CoreScreenService {
     }
 
     get orientation(): CoreScreenOrientation {
-        if (!this.orientationDataExists()) {
-            // Not initialized yet, assume portrait.
-            return CoreScreenOrientation.PORTRAIT;
-        }
-
-        return screen.orientation.type?.startsWith(CoreScreenOrientation.LANDSCAPE)
+        return screen.orientation.type.startsWith(CoreScreenOrientation.LANDSCAPE)
             ? CoreScreenOrientation.LANDSCAPE
             : CoreScreenOrientation.PORTRAIT;
     }
@@ -208,24 +201,6 @@ export class CoreScreenService {
         }
 
         return CoreScreenLayout.MOBILE;
-    }
-
-    /**
-     * Initialize the orientation signal value.
-     */
-    protected async initializeOrientation(): Promise<void> {
-        await CorePlatform.ready();
-
-        this._orientationSignal.set(this.orientation);
-    }
-
-    /**
-     * Check if the orientation data exists.
-     *
-     * @returns Whether the orientation data exists.
-     */
-    protected orientationDataExists(): boolean {
-        return !!screen?.orientation;
     }
 
 }

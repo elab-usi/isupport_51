@@ -40,7 +40,7 @@ import { CoreLogger } from '@singletons/logger';
 import { CoreObject } from '@singletons/object';
 import { CoreDynamicComponent } from '@components/dynamic-component/dynamic-component';
 import { CoreQuestionBaseComponent } from '@features/question/classes/base-question-component';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { CoreSharedModule } from '@/core/shared.module';
 
 /**

@@ -16,7 +16,7 @@ import { Injectable } from '@angular/core';
 import {
     CoreUserProfileHandlerType,
     CoreUserProfileHandler,
-    CoreUserProfileListHandlerData,
+    CoreUserProfileHandlerData,
 } from '@features/user/services/user-delegate';
 import { CoreNavigator } from '@services/navigator';
 import { makeSingleton } from '@singletons';
@@ -31,7 +31,7 @@ export class CoreDataPrivacyUserHandlerService implements CoreUserProfileHandler
 
     protected pageName = CORE_DATAPRIVACY_PAGE_NAME;
 
-    readonly type = CoreUserProfileHandlerType.LIST_ACCOUNT_ITEM;
+    type = CoreUserProfileHandlerType.LIST_ACCOUNT_ITEM;
     name = 'CoreDataPrivacy';
     priority = 100;
 
@@ -45,7 +45,7 @@ export class CoreDataPrivacyUserHandlerService implements CoreUserProfileHandler
     /**
      * @inheritdoc
      */
-    getDisplayData(): CoreUserProfileListHandlerData {
+    getDisplayData(): CoreUserProfileHandlerData {
         return {
             class: 'core-data-privacy',
             icon: 'fas-user-shield',

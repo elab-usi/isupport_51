@@ -1,4 +1,4 @@
-@app_parallel_run_courses @addon_block_timeline @app @block @block_timeline @javascript
+@addon_block_timeline @app @block @block_timeline @javascript
 Feature: Timeline block.
 
   Background:
@@ -114,7 +114,6 @@ Feature: Timeline block.
     But I should not find "Course 1" in the app
     And I should not find "Assignment 02" within "Timeline" "ion-card" in the app
 
-  @disabled_features
   Scenario: Block is included in disabled features
     Given the following config values are set as admin:
       | disabledfeatures | CoreBlockDelegate_AddonBlockTimeline | tool_mobile |

@@ -41,11 +41,9 @@ export class CoreUpdateNonReactiveAttributesDirective implements OnInit, OnDestr
             // Propagate label to button.
             const ariaLabel = this.element.getAttribute('aria-label');
 
-            if (ariaLabel) {
-                button.setAttribute('aria-label', ariaLabel);
-            } else {
-                button.removeAttribute('aria-label');
-            }
+            ariaLabel
+                ? button.setAttribute('aria-label', ariaLabel)
+                : button.removeAttribute('aria-label');
         });
     }
 

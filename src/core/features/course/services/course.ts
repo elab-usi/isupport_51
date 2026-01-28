@@ -51,6 +51,7 @@ import { CoreText, CoreTextFormat } from '@singletons/text';
 import { ArrayElement } from '@/core/utils/types';
 import { CORE_COURSES_MY_COURSES_UPDATED_EVENT, CoreCoursesMyCoursesUpdatedEventAction } from '@features/courses/constants';
 import {
+    CoreCourseAccessDataType,
     CoreCourseModuleCompletionStatus,
     CoreCourseModuleCompletionTracking,
     CORE_COURSE_ALL_COURSES_CLEARED,
@@ -93,6 +94,15 @@ declare module '@singletons/events' {
  */
 @Injectable({ providedIn: 'root' })
 export class CoreCourseProvider {
+
+    /**
+     * @deprecated since 4.4 Not used anymore. Use CoreCourseAccessDataType instead.
+     */
+    static readonly ACCESS_GUEST = CoreCourseAccessDataType.ACCESS_GUEST;
+    /**
+     * @deprecated since 4.4 Not used anymore. Use CoreCourseAccessDataType instead.
+     */
+    static readonly ACCESS_DEFAULT = CoreCourseAccessDataType.ACCESS_DEFAULT;
 
     /**
      * @deprecated since 5.0 Not used anymore. Use COURSE_ALL_SECTIONS_ID instead.
@@ -468,8 +478,8 @@ export class CoreCourseProvider {
         moduleId: number,
         courseId?: number,
         sectionId?: number,
-        preferCache = false,
-        ignoreCache = false,
+        preferCache: boolean = false,
+        ignoreCache: boolean = false,
         siteId?: string,
         modName?: string,
     ): Promise<CoreCourseModuleData> {
@@ -818,11 +828,11 @@ export class CoreCourseProvider {
      */
     async getSections(
         courseId: number,
-        excludeModules = false,
-        excludeContents = false,
+        excludeModules: boolean = false,
+        excludeContents: boolean = false,
         preSets?: CoreSiteWSPreSets,
         siteId?: string,
-        includeStealthModules = true,
+        includeStealthModules: boolean = true,
     ): Promise<CoreCourseWSSection[]> {
         return await firstValueFrom(this.getSectionsObservable(courseId, {
             excludeModules,
@@ -967,7 +977,7 @@ export class CoreCourseProvider {
      */
     getSectionsModules<
         Section extends CoreCourseWSSection,
-        Module = Extract<ArrayElement<Section['contents']>, CoreCourseModuleData>,
+        Module = Extract<ArrayElement<Section['contents']>, CoreCourseModuleData>
     >(
         sections: Section[],
         options: CoreCourseGetSectionsModulesOptions<Section, Module> = {},
@@ -1418,7 +1428,7 @@ export class CoreCourseProvider {
      * @param courseId Course ID.
      * @param siteId Site ID. If not defined, current site.
      * @returns Promise resolved when the status is changed. Resolve param: new status.
-     * @deprecated since 5.0. Use CoreCourseDownloadStatusHelper.setCoursePreviousStatus.
+     * @deprecated since 5.0. Use CoreCourseStatusHelper.setCoursePreviousStatus.
      */
     async setCoursePreviousStatus(courseId: number, siteId?: string): Promise<DownloadStatus> {
         return CoreCourseDownloadStatusHelper.setCoursePreviousStatus(courseId, siteId);
@@ -1540,7 +1550,7 @@ export type CoreCourseCompletionActivityStatus = {
     state: CoreCourseModuleCompletionStatus; // Completion state value.
     timecompleted: number; // Timestamp for completed activity.
     tracking: CoreCourseModuleCompletionTracking; // Type of tracking: 0 means none, 1 manual, 2 automatic.
-    overrideby: number | null; // The user id who has overridden the status, or null.
+    overrideby: number | null; // The user id who has overriden the status, or null.
     valueused?: boolean; // Whether the completion status affects the availability of another activity.
     hascompletion?: boolean; // @since 3.11. Whether this activity module has completion enabled.
     isautomatic?: boolean; // @since 3.11. Whether this activity module instance tracks completion automatically.
@@ -1755,7 +1765,7 @@ type CoreCourseGetCourseModuleWSResponse = {
 export type CoreCourseModuleWSCompletionData = {
     state: CoreCourseModuleCompletionStatus; // Completion state value.
     timecompleted: number; // Timestamp for completion status.
-    overrideby: number | null; // The user id who has overridden the status.
+    overrideby: number | null; // The user id who has overriden the status.
     valueused?: boolean; // Whether the completion status affects the availability of another activity.
     hascompletion?: boolean; // @since 3.11. Whether this activity module has completion enabled.
     isautomatic?: boolean; // @since 3.11. Whether this activity module instance tracks completion automatically.

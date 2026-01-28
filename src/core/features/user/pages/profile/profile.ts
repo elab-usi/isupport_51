@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
-import { Component, OnDestroy, OnInit, inject, viewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { CoreSite } from '@classes/sites/site';
@@ -25,9 +25,7 @@ import {
     CoreUserDelegate,
     CoreUserDelegateContext,
     CoreUserProfileHandlerType,
-    CoreUserProfileListActionHandlerData,
-    CoreUserProfileListHandlerData,
-    CoreUserProfileButtonHandlerData,
+    CoreUserProfileHandlerData,
 } from '@features/user/services/user-delegate';
 import { CorePromiseUtils } from '@singletons/promise-utils';
 import { CoreNavigator } from '@services/navigator';
@@ -41,8 +39,6 @@ import { Translate } from '@singletons';
 import { CoreAlerts } from '@services/overlays/alerts';
 import { CoreSharedModule } from '@/core/shared.module';
 import { CORE_USER_PROFILE_REFRESHED } from '@features/user/constants';
-import { CoreDynamicComponent } from '@components/dynamic-component/dynamic-component';
-import type { ReloadableComponent } from '@coretypes/reloadable-component';
 
 @Component({
     selector: 'page-core-user-profile',
@@ -54,8 +50,6 @@ import type { ReloadableComponent } from '@coretypes/reloadable-component';
 })
 export default class CoreUserProfilePage implements OnInit, OnDestroy {
 
-    readonly dynamicComponents = viewChildren<CoreDynamicComponent<ReloadableComponent>>(CoreDynamicComponent);
-
     userLoaded = false;
     isLoadingHandlers = false;
     user?: CoreUserProfile;
@@ -63,8 +57,8 @@ export default class CoreUserProfilePage implements OnInit, OnDestroy {
     isSuspended = false;
     isEnrolled = true;
     rolesFormatted?: string;
-    listItemHandlers: ListHandlerData[] = [];
-    buttonHandlers: ButtonHandlerData[] = [];
+    listItemHandlers: CoreUserProfileHandlerData[] = [];
+    buttonHandlers: CoreUserProfileHandlerData[] = [];
 
     users?: CoreUserSwipeItemsManager;
 
@@ -162,11 +156,6 @@ export default class CoreUserProfilePage implements OnInit, OnDestroy {
             this.subscription?.unsubscribe();
 
             const context = this.courseId ? CoreUserDelegateContext.COURSE : CoreUserDelegateContext.SITE;
-            const defaultComponentData = {
-                user: this.user,
-                context,
-                courseId: this.courseId,
-            };
 
             this.subscription = CoreUserDelegate.getProfileHandlersFor(user, context, this.courseId).subscribe((handlers) => {
                 this.listItemHandlers = [];
@@ -174,21 +163,14 @@ export default class CoreUserProfilePage implements OnInit, OnDestroy {
                 handlers.forEach((handler) => {
                     switch (handler.type) {
                         case CoreUserProfileHandlerType.BUTTON:
-                            this.buttonHandlers.push({ name: handler.name, ...handler.data } as ButtonHandlerData);
+                            this.buttonHandlers.push(handler.data);
                             break;
                         case CoreUserProfileHandlerType.LIST_ACCOUNT_ITEM:
                             // Discard this for now.
                             break;
                         case CoreUserProfileHandlerType.LIST_ITEM:
                         default:
-                            this.listItemHandlers.push({
-                                name: handler.name,
-                                ...handler.data,
-                                componentData: 'componentData' in handler.data ? {
-                                    ...defaultComponentData,
-                                    ...(handler.data.componentData || {}),
-                                } : undefined,
-                            });
+                            this.listItemHandlers.push(handler.data);
                             break;
                     }
                 });
@@ -214,15 +196,9 @@ export default class CoreUserProfilePage implements OnInit, OnDestroy {
             CoreUser.invalidateUserCache(this.userId),
             CoreCourses.invalidateUserNavigationOptions(),
             CoreCourses.invalidateUserAdministrationOptions(),
-            ...(this.dynamicComponents()?.map((component) =>
-                Promise.resolve(component.callComponentMethod('invalidateContent'))) || []),
         ]));
 
         await this.fetchUser();
-
-        await CorePromiseUtils.allPromisesIgnoringErrors(
-            this.dynamicComponents()?.map((component) => Promise.resolve(component.callComponentMethod('reloadContent'))),
-        );
 
         event?.complete();
 
@@ -236,12 +212,24 @@ export default class CoreUserProfilePage implements OnInit, OnDestroy {
     }
 
     /**
+     * Open the page with the user details.
+     */
+    openUserDetails(): void {
+        CoreNavigator.navigateToSitePath('user/about', {
+            params: {
+                courseId: this.courseId,
+                userId: this.userId,
+            },
+        });
+    }
+
+    /**
      * A handler was clicked.
      *
      * @param event Click event.
      * @param handler Handler that was clicked.
      */
-    handlerClicked(event: Event, handler: CoreUserProfileButtonHandlerData | CoreUserProfileListActionHandlerData): void {
+    handlerClicked(event: Event, handler: CoreUserProfileHandlerData): void {
         if (!this.user) {
             return;
         }
@@ -274,7 +262,3 @@ class CoreUserSwipeItemsManager extends CoreSwipeNavigationItemsManager {
     }
 
 }
-
-type ListHandlerData = CoreUserProfileListHandlerData & { name: string };
-
-type ButtonHandlerData = CoreUserProfileButtonHandlerData & { name: string };

@@ -346,7 +346,7 @@ export const enum AddonBlockTimelineFilter {
 /**
  * Select option.
  */
-export type AddonBlockTimelineOption<Value> = {
+export interface AddonBlockTimelineOption<Value> {
     value: Value;
     name: string;
-};
+}

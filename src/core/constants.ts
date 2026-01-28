@@ -19,8 +19,15 @@ import {
     ModFeature,
     ModResourceDisplay,
 } from '@addons/mod/constants';
-import { LOGIN_SSO_LAUNCH_DATA, NO_SITE_ID } from '@features/login/constants';
-import { CORE_USER_CALENDAR_DEFAULT_STARTING_WEEKDAY } from '@features/user/constants';
+import { InjectionToken } from '@angular/core';
+import { CoreStorageTable } from '@services/storage';
+import { CoreBrowser } from '@singletons/browser';
+
+/**
+ * Injection token used for dependencies marked as optional that will never
+ * be resolved by Angular injectors.
+ */
+export const NULL_INJECTION_TOKEN: InjectionToken<() => Promise<CoreStorageTable>> = new InjectionToken('null');
 
 /**
  * Context levels enumeration.
@@ -93,7 +100,6 @@ export const MOODLE_RELEASES = {
     '4.5': 2024100700,
     '5.0': 2025041400,
     '5.1': 2025100600,
-    '5.2': 2025110000, // @todo [5.2] replace with right value when released. Using a tmp value to be able to test new things.
 };
 
 /**
@@ -119,238 +125,85 @@ export const enum LMSBadgeStyle {
     INFO = 'info',
 }
 
-export enum CoreTimeConstants {
-    SECONDS_YEAR = 31536000,
-    SECONDS_MONTH = 2592000,
-    SECONDS_WEEK = 604800,
-    SECONDS_DAY = 86400,
-    SECONDS_HOUR = 3600,
-    SECONDS_MINUTE = 60,
-    MILLISECONDS_YEAR = 31536000000,
-    MILLISECONDS_MONTH = 2592000000,
-    MILLISECONDS_WEEK = 604800000,
-    MILLISECONDS_DAY = 86400000,
-    MILLISECONDS_HOUR = 3600000,
-    MILLISECONDS_MINUTE = 60000,
-    MILLISECONDS_SECOND = 1000,
-};
-
-export enum CoreBytesConstants {
-    UNIT_MULTIPLIER = 1024,
-    KILOBYTE = CoreBytesConstants.UNIT_MULTIPLIER,
-    MEGABYTE = CoreBytesConstants.UNIT_MULTIPLIER * CoreBytesConstants.UNIT_MULTIPLIER,
-    GIGABYTE = CoreBytesConstants.UNIT_MULTIPLIER * CoreBytesConstants.UNIT_MULTIPLIER * CoreBytesConstants.UNIT_MULTIPLIER,
-};
-
-export enum CoreConfigSettingKey {
-    NOTIFICATION_SOUND = 'CoreSettingsNotificationSound',
-    SYNC_ONLY_ON_WIFI = 'CoreSettingsSyncOnlyOnWifi',
-    DEBUG_DISPLAY = 'CoreSettingsDebugDisplay',
-    SEND_ON_ENTER = 'CoreSettingsSendOnEnter',
-    ZOOM_LEVEL = 'CoreSettingsZoomLevel',
-    COLOR_SCHEME = 'CoreSettingsColorScheme',
-    ANALYTICS_ENABLED = 'CoreSettingsAnalyticsEnabled',
-    DONT_SHOW_EXTERNAL_LINK_WARN = 'CoreSettingsDontShowExtLinkWarn',
-    PINCH_TO_ZOOM = 'CoreSettingsPinchToZoom',
-    EXACT_ALARMS_WARNING_DISPLAYED = 'CoreScheduleExactWarningModalDisplayed',
-    DONT_SHOW_EXACT_ALARMS_WARNING = 'CoreDontShowScheduleExactWarning',
-    DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING = 'CoreDontShowNotificationsPermissionWarning',
-};
-
-export const LOADING_ICON = 'spinner';
-
-export const enum CoreRefreshIcon {
-    LOADING = LOADING_ICON,
-    REFRESH = 'fas-rotate-right',
-};
-
-export const enum CoreSyncIcon {
-    LOADING = LOADING_ICON,
-    SYNC = 'fas-rotate',
-};
-
-export enum CoreLinkOpenMethod {
-    APP = 'app',
-    INAPPBROWSER = 'inappbrowser',
-    BROWSER = 'browser',
-    EMBEDDED = 'embedded',
-};
-
 /**
  * Static class to contain all the core constants.
  */
 export class CoreConstants {
 
-     /**
-      * @deprecated since 5.2. Use CoreTimeConstants.SECONDS_YEAR instead.
-      */
-    static readonly SECONDS_YEAR = CoreTimeConstants.SECONDS_YEAR;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.SECONDS_MONTH instead.
-     */
-    static readonly SECONDS_MONTH = CoreTimeConstants.SECONDS_MONTH;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.SECONDS_WEEK instead.
-     */
-    static readonly SECONDS_WEEK = CoreTimeConstants.SECONDS_WEEK;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.SECONDS_DAY instead.
-     */
-    static readonly SECONDS_DAY = CoreTimeConstants.SECONDS_DAY;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.SECONDS_HOUR instead.
-     */
-    static readonly SECONDS_HOUR = CoreTimeConstants.SECONDS_HOUR;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.SECONDS_MINUTE instead.
-     */
-    static readonly SECONDS_MINUTE = CoreTimeConstants.SECONDS_MINUTE;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.MILLISECONDS_YEAR instead.
-     */
-    static readonly MILLISECONDS_YEAR = CoreTimeConstants.MILLISECONDS_YEAR;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.MILLISECONDS_MONTH instead.
-     */
-    static readonly MILLISECONDS_MONTH = CoreTimeConstants.MILLISECONDS_MONTH;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.MILLISECONDS_WEEK instead.
-     */
-    static readonly MILLISECONDS_WEEK = CoreTimeConstants.MILLISECONDS_WEEK;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.MILLISECONDS_DAY instead.
-     */
-    static readonly MILLISECONDS_DAY = CoreTimeConstants.MILLISECONDS_DAY;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.MILLISECONDS_HOUR instead.
-     */
-    static readonly MILLISECONDS_HOUR = CoreTimeConstants.MILLISECONDS_HOUR;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.MILLISECONDS_MINUTE instead.
-     */
-    static readonly MILLISECONDS_MINUTE = CoreTimeConstants.MILLISECONDS_MINUTE;
-    /**
-     * @deprecated since 5.2. Use CoreTimeConstants.MILLISECONDS_SECOND instead.
-     */
-    static readonly MILLISECONDS_SECOND = CoreTimeConstants.MILLISECONDS_SECOND;
-
-    /**
-     * @deprecated since 5.2. Use CoreFileProvider.WIFI_DOWNLOAD_DEFAULT_CONFIRMATION_THRESHOLD instead.
-     */
-    static readonly WIFI_DOWNLOAD_THRESHOLD = 100 * CoreBytesConstants.MEGABYTE;
-    /**
-     * @deprecated since 5.2. Use CoreFileProvider.DOWNLOAD_DEFAULT_CONFIRMATION_THRESHOLD instead.
-     */
-    static readonly DOWNLOAD_THRESHOLD = 10 * CoreBytesConstants.MEGABYTE;
-    /**
-     * @deprecated since 5.2. Use CoreFileProvider.MINIMUM_FREE_SPACE instead.
-     */
-    static readonly MINIMUM_FREE_SPACE = 10 * CoreBytesConstants.MEGABYTE;
-    /**
-     * @deprecated since 5.2. Not needed anymore.
-     */
-    static readonly IOS_FREE_SPACE_THRESHOLD = 500 * CoreBytesConstants.MEGABYTE;
-
-    /**
-     * @deprecated since 5.2. Use NO_SITE_ID constant instead.
-     */
-    static readonly NO_SITE_ID = NO_SITE_ID;
+    static readonly SECONDS_YEAR = 31536000;
+    static readonly SECONDS_MONTH = 2592000;
+    static readonly SECONDS_WEEK = 604800;
+    static readonly SECONDS_DAY = 86400;
+    static readonly SECONDS_HOUR = 3600;
+    static readonly SECONDS_MINUTE = 60;
+    static readonly MILLISECONDS_YEAR = 31536000000;
+    static readonly MILLISECONDS_MONTH = 2592000000;
+    static readonly MILLISECONDS_WEEK = 604800000;
+    static readonly MILLISECONDS_DAY = 86400000;
+    static readonly MILLISECONDS_HOUR = 3600000;
+    static readonly MILLISECONDS_MINUTE = 60000;
+    static readonly MILLISECONDS_SECOND = 1000;
+    static readonly WIFI_DOWNLOAD_THRESHOLD = 104857600; // 100MB.
+    static readonly DOWNLOAD_THRESHOLD = 10485760; // 10MB.
+    static readonly MINIMUM_FREE_SPACE = 10485760; // 10MB.
+    static readonly IOS_FREE_SPACE_THRESHOLD = 524288000; // 500MB.
+    static readonly NO_SITE_ID = 'NoSite';
 
     // Settings constants.
     /**
      * @deprecated since 5.0. Plain text area editor has been removed.
      */
     static readonly SETTINGS_RICH_TEXT_EDITOR = 'CoreSettingsRichTextEditor';
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.NOTIFICATION_SOUND instead.
-     */
-    static readonly SETTINGS_NOTIFICATION_SOUND = CoreConfigSettingKey.NOTIFICATION_SOUND;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.SYNC_ONLY_ON_WIFI instead.
-     */
-    static readonly SETTINGS_SYNC_ONLY_ON_WIFI = CoreConfigSettingKey.SYNC_ONLY_ON_WIFI;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.DEBUG_DISPLAY instead.
-     */
-    static readonly SETTINGS_DEBUG_DISPLAY = CoreConfigSettingKey.DEBUG_DISPLAY;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.SEND_ON_ENTER instead.
-     */
-    static readonly SETTINGS_SEND_ON_ENTER = CoreConfigSettingKey.SEND_ON_ENTER;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.ZOOM_LEVEL instead.
-     */
-    static readonly SETTINGS_ZOOM_LEVEL = CoreConfigSettingKey.ZOOM_LEVEL;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.COLOR_SCHEME instead.
-     */
-    static readonly SETTINGS_COLOR_SCHEME = CoreConfigSettingKey.COLOR_SCHEME;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.ANALYTICS_ENABLED instead.
-     */
-    static readonly SETTINGS_ANALYTICS_ENABLED = CoreConfigSettingKey.ANALYTICS_ENABLED;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.DONT_SHOW_EXTERNAL_LINK_WARN instead.
-     */
-    static readonly SETTINGS_DONT_SHOW_EXTERNAL_LINK_WARN = CoreConfigSettingKey.DONT_SHOW_EXTERNAL_LINK_WARN;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.PINCH_TO_ZOOM instead.
-     */
-    static readonly SETTINGS_PINCH_TO_ZOOM = CoreConfigSettingKey.PINCH_TO_ZOOM;
+    static readonly SETTINGS_NOTIFICATION_SOUND = 'CoreSettingsNotificationSound';
+    static readonly SETTINGS_SYNC_ONLY_ON_WIFI = 'CoreSettingsSyncOnlyOnWifi';
+    static readonly SETTINGS_DEBUG_DISPLAY = 'CoreSettingsDebugDisplay';
+    static readonly SETTINGS_SEND_ON_ENTER = 'CoreSettingsSendOnEnter';
+    static readonly SETTINGS_ZOOM_LEVEL = 'CoreSettingsZoomLevel';
+    static readonly SETTINGS_COLOR_SCHEME = 'CoreSettingsColorScheme';
+    static readonly SETTINGS_ANALYTICS_ENABLED = 'CoreSettingsAnalyticsEnabled';
+    static readonly SETTINGS_DONT_SHOW_EXTERNAL_LINK_WARN = 'CoreSettingsDontShowExtLinkWarn';
+    static readonly SETTINGS_PINCH_TO_ZOOM = 'CoreSettingsPinchToZoom';
 
     // WS constants.
-    /**
-     * Timeout when not in WiFi.
-     *
-     * @deprecated since 5.2. Use CoreWSProvider.WS_TIMEOUT instead.
-     */
-    static readonly WS_TIMEOUT = 30000;
-    /**
-     * Timeout when in WiFi.
-     *
-     * @deprecated since 5.2. Use CoreWSProvider.WS_TIMEOUT_WIFI instead.
-     */
-    static readonly WS_TIMEOUT_WIFI = 30000;
+    static readonly WS_TIMEOUT = 30000; // Timeout when not in WiFi.
+    static readonly WS_TIMEOUT_WIFI = 30000; // Timeout when in WiFi.
 
+    // Login constants.
+    static readonly LOGIN_LAUNCH_DATA = 'CoreLoginLaunchData';
+
+    // Download status constants.
     /**
-     * @deprecated since 5.2. Use LOGIN_SSO_LAUNCH_DATA instead.
+     * @deprecated since 4.4. Use DownloadStatus.DOWNLOADED instead.
      */
-    static readonly LOGIN_LAUNCH_DATA = LOGIN_SSO_LAUNCH_DATA;
+    static readonly DOWNLOADED = DownloadStatus.DOWNLOADED;
+    /**
+     * @deprecated since 4.4. Use DownloadStatus.DOWNLOADING instead.
+     */
+    static readonly DOWNLOADING = DownloadStatus.DOWNLOADING;
+    /**
+     * @deprecated since 4.4. Use DownloadStatus.DOWNLOADABLE_NOT_DOWNLOADED instead.
+     */
+    static readonly NOT_DOWNLOADED = DownloadStatus.DOWNLOADABLE_NOT_DOWNLOADED;
+    /**
+     * @deprecated since 4.4. Use DownloadStatus.OUTDATED instead.
+     */
+    static readonly OUTDATED = DownloadStatus.OUTDATED;
+    /**
+     * @deprecated since 4.4. Use DownloadStatus.NOT_DOWNLOADABLE instead.
+     */
+    static readonly NOT_DOWNLOADABLE = DownloadStatus.NOT_DOWNLOADABLE;
 
     // Download / prefetch status icon.
-    /**
-     * @deprecated since 5.2. Use CoreCourseDownloadStatusIcon.DOWNLOADED instead.
-     */
     static readonly ICON_DOWNLOADED = 'fam-cloud-done';
-    /**
-     * @deprecated since 5.2. Use CoreCourseDownloadStatusIcon.DOWNLOADING instead.
-     */
     static readonly ICON_DOWNLOADING = 'spinner';
-    /**
-     * @deprecated since 5.2. Use CoreCourseDownloadStatusIcon.NOT_DOWNLOADED instead.
-     */
     static readonly ICON_NOT_DOWNLOADED = 'fas-cloud-arrow-down';
-    /**
-     * @deprecated since 5.2. Use CoreCourseDownloadStatusIcon.OUTDATED instead.
-     */
     static readonly ICON_OUTDATED = 'fam-cloud-refresh';
-    /**
-     * @deprecated since 5.2. Use CoreCourseDownloadStatusIcon.NOT_DOWNLOADABLE instead.
-     */
     static readonly ICON_NOT_DOWNLOADABLE = '';
 
-    /**
-     * @deprecated since 5.2. Use CoreRefreshIcon.LOADING or CoreSyncIcon.LOADING or LOADING_ICON instead.
-     */
-    static readonly ICON_LOADING = LOADING_ICON;
-    /**
-     * @deprecated since 5.2. Use CoreRefreshIcon.REFRESH instead.
-     */
-    static readonly ICON_REFRESH = CoreRefreshIcon.REFRESH;
-    /**
-     * @deprecated since 5.2. Use CoreSyncIcon.SYNC instead.
-     */
-    static readonly ICON_SYNC = CoreSyncIcon.SYNC;
+    // General download and sync icons.
+    static readonly ICON_LOADING = 'spinner';
+    static readonly ICON_REFRESH = 'fas-rotate-right';
+    static readonly ICON_SYNC = 'fas-rotate';
 
     /**
      * @deprecated since 5.0. Use ModResourceDisplay.AUTO instead.
@@ -480,23 +333,10 @@ export class CoreConstants {
     static readonly MOD_ARCHETYPE_SYSTEM = ModArchetype.SYSTEM;
 
     // Other constants.
-    /**
-     * @deprecated since 5.2. Use CORE_USER_CALENDAR_DEFAULT_STARTING_WEEKDAY instead.
-     */
-    static readonly CALENDAR_DEFAULT_STARTING_WEEKDAY = CORE_USER_CALENDAR_DEFAULT_STARTING_WEEKDAY;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING instead.
-     */
-    static readonly DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING = CoreConfigSettingKey.DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING;
-
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.DONT_SHOW_EXACT_ALARMS_WARNING instead.
-     */
-    static readonly DONT_SHOW_EXACT_ALARMS_WARNING = CoreConfigSettingKey.DONT_SHOW_EXACT_ALARMS_WARNING;
-    /**
-     * @deprecated since 5.2. Use CoreConfigSettingKey.EXACT_ALARMS_WARNING_DISPLAYED instead.
-     */
-    static readonly EXACT_ALARMS_WARNING_DISPLAYED = CoreConfigSettingKey.EXACT_ALARMS_WARNING_DISPLAYED;
+    static readonly CALENDAR_DEFAULT_STARTING_WEEKDAY = 1;
+    static readonly DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING = 'CoreDontShowNotificationsPermissionWarning';
+    static readonly DONT_SHOW_EXACT_ALARMS_WARNING = 'CoreDontShowScheduleExactWarning';
+    static readonly EXACT_ALARMS_WARNING_DISPLAYED = 'CoreScheduleExactWarningModalDisplayed';
 
     // Config & environment constants.
     static readonly CONFIG = { ...envJson.config } as unknown as EnvironmentConfig; // Data parsed from config.json files.
@@ -506,21 +346,12 @@ export class CoreConstants {
      * Check whether devtools should be enabled.
      *
      * @returns Whether devtools should be enabled.
-     *
-     * @deprecated since 5.2. Use isDevOrTestingBuild() instead.
      */
     static enableDevTools(): boolean {
-        return CoreConstants.isDevOrTestingBuild();
-
-    }
-
-    /**
-     * Check whether the build is a development or testing build.
-     *
-     * @returns Whether the build is a development or testing build.
-     */
-    static isDevOrTestingBuild(): boolean {
-        return CoreConstants.BUILD.isDevelopment || CoreConstants.BUILD.isTesting;
+        // @todo [4.0] This is not the proper way to check for development tools, we should rely only on the BUILD variable.
+        return this.BUILD.isDevelopment
+            || this.BUILD.isTesting
+            || CoreBrowser.hasDevelopmentSetting('DevTools');
     }
 
 }

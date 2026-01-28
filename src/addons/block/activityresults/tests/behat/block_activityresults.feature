@@ -1,4 +1,4 @@
-@app_parallel_run_blocks @addon_block_activity_results @app @block @block_activity_results @javascript
+@addon_block_activity_results @app @block @block_activity_results @javascript
 Feature: Basic tests of activity results block
 
   Background:
@@ -21,7 +21,6 @@ Feature: Basic tests of activity results block
     Then I should find "Activity results" in the app
     And I should find "Please configure this block" in the app
 
-  @disabled_features
   Scenario: Block is included in disabled features
     # Add another block just to ensure there is something in the block region and the drawer is displayed.
     Given the following "blocks" exist:

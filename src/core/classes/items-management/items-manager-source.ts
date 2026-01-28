@@ -15,10 +15,10 @@
 /**
  * Updates listener.
  */
-export type CoreItemsManagerSourceListener<Item> = {
+export interface CoreItemsManagerSourceListener<Item> {
     onItemsUpdated?(items: Item[]): void;
     onReset?(): void;
-};
+}
 
 /**
  * Items collection source data.

@@ -15,7 +15,7 @@
 import { CoreNavigator } from '@services/navigator';
 import { CoreModals } from '@services/overlays/modals';
 import { Subject } from 'rxjs';
-import type { AsyncDirective } from '../types/async-directive';
+import { AsyncDirective } from './async-directive';
 import { PageLoadWatcher } from './page-load-watcher';
 
 /**

@@ -27,7 +27,7 @@ import { ContextLevel } from '@/core/constants';
 import { toBoolean } from '@/core/transforms/boolean';
 import { convertTextToHTMLElement } from '@/core/utils/create-html-element';
 import { CorePromisedValue } from '@classes/promised-value';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 
 /**
  * Base class for components to render a question.

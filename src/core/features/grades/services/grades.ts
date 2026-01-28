@@ -120,7 +120,7 @@ export class CoreGradesProvider {
         userId?: number,
         groupId?: number,
         siteId?: string,
-        ignoreCache = false,
+        ignoreCache: boolean = false,
     ): Promise<CoreGradesGradeItem[]> {
         siteId = siteId || CoreSites.getCurrentSiteId();
 
@@ -146,7 +146,7 @@ export class CoreGradesProvider {
         userId?: number,
         groupId?: number,
         siteId?: string,
-        ignoreCache = false,
+        ignoreCache: boolean = false,
     ): Promise<CoreGradesGradeItem[]> {
         const site = await CoreSites.getSite(siteId);
 
@@ -195,7 +195,7 @@ export class CoreGradesProvider {
         courseId: number,
         userId?: number,
         siteId?: string,
-        ignoreCache = false,
+        ignoreCache: boolean = false,
     ): Promise<CoreGradesTable> {
         const site = await CoreSites.getSite(siteId);
 

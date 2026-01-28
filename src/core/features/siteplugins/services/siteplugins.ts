@@ -19,7 +19,7 @@ import { CoreSite } from '@classes/sites/site';
 import { CoreCourseAnyModuleData } from '@features/course/services/course';
 import { CoreCourses } from '@features/courses/services/courses';
 import { CoreFilepool } from '@services/filepool';
-import { CoreLang, CoreLangFormat, CoreLangTranslationByLanguage } from '@services/lang';
+import { CoreLang, CoreLangFormat } from '@services/lang';
 import { CoreSites } from '@services/sites';
 import { CoreText } from '@singletons/text';
 import { CoreUtils } from '@singletons/utils';
@@ -53,8 +53,8 @@ export class CoreSitePluginsProvider {
     static readonly UPDATE_COURSE_CONTENT = CORE_SITE_PLUGINS_UPDATE_COURSE_CONTENT;
 
     protected logger: CoreLogger;
-    protected sitePlugins: { [name: string]: CoreSitePluginsHandler } = {}; // Site plugins registered.
-    protected sitePluginPromises: { [name: string]: Promise<void> } = {}; // Promises of loading plugins.
+    protected sitePlugins: {[name: string]: CoreSitePluginsHandler} = {}; // Site plugins registered.
+    protected sitePluginPromises: {[name: string]: Promise<void>} = {}; // Promises of loading plugins.
     protected fetchPluginsDeferred: CorePromisedValue<void>;
     protected moduleHandlerInstances: Record<string, CoreSitePluginsModuleHandler> = {};
 
@@ -812,7 +812,7 @@ export type CoreSitePluginsWSPlugin = {
  */
 export type CoreSitePluginsPlugin = CoreSitePluginsWSPlugin & {
     parsedHandlers?: Record<string, CoreSitePluginsHandlerData> | null;
-    parsedLang?: CoreLangTranslationByLanguage | null;
+    parsedLang?: Record<string, string[]> | null;
 };
 
 /**
@@ -864,7 +864,6 @@ export type CoreSitePluginsMainMenuHandlerData = CoreSitePluginsHandlerCommonDat
     };
     priority?: number;
     ptrenabled?: boolean;
-    displayinline?: boolean;
 };
 
 /**
@@ -916,7 +915,6 @@ export type CoreSitePluginsUserHandlerData = CoreSitePluginsHandlerCommonData & 
     priority?: number;
     ptrenabled?: boolean;
     displayinusermenu?: CoreSitePluginsDisplayInUserMenu;
-    displayinline?: boolean;
 };
 
 /**

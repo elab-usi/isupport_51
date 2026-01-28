@@ -41,7 +41,7 @@ export class CoreSwipeNavigationDirective implements AfterViewInit, OnDestroy {
     protected swipeGesture?: Gesture;
 
     constructor() {
-        if (CoreConstants.isDevOrTestingBuild()) {
+        if (CoreConstants.enableDevTools()) {
             this.element['swipeNavigation'] = this;
             this.element.classList.add('uses-swipe-navigation');
         }
@@ -107,11 +107,9 @@ export class CoreSwipeNavigationDirective implements AfterViewInit, OnDestroy {
             return;
         }
 
-        if (CorePlatform.isRTL) {
-            this.manager()?.navigateToPreviousItem();
-        } else {
-            this.manager()?.navigateToNextItem();
-        }
+        CorePlatform.isRTL
+            ? this.manager()?.navigateToPreviousItem()
+            : this.manager()?.navigateToNextItem();
     }
 
     /**
@@ -122,11 +120,9 @@ export class CoreSwipeNavigationDirective implements AfterViewInit, OnDestroy {
             return;
         }
 
-        if (CorePlatform.isRTL) {
-            this.manager()?.navigateToNextItem();
-        } else {
-            this.manager()?.navigateToPreviousItem();
-        }
+        CorePlatform.isRTL
+            ? this.manager()?.navigateToNextItem()
+            : this.manager()?.navigateToPreviousItem();
     }
 
     /**

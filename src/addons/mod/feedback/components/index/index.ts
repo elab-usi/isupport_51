@@ -361,9 +361,6 @@ export class AddonModFeedbackIndexComponent extends CoreCourseModuleMainActivity
                     return parsed.show !== undefined ? parsed.show : false;
                 }).filter((dataItem) => dataItem); // Filter false entries.
 
-                item.templateName = AddonModFeedbackAnalysisTemplateNames.LIST;
-                break;
-
             case AddonModFeedbackQuestionType.TEXTFIELD:
             case AddonModFeedbackQuestionType.TEXTAREA:
                 item.templateName = AddonModFeedbackAnalysisTemplateNames.LIST;
@@ -418,7 +415,7 @@ export class AddonModFeedbackIndexComponent extends CoreCourseModuleMainActivity
      *
      * @param preview Preview or edit the form.
      */
-    gotoAnswerQuestions(preview = false): void {
+    gotoAnswerQuestions(preview: boolean = false): void {
         CoreNavigator.navigateToSitePath(
             `${ADDON_MOD_FEEDBACK_PAGE_NAME}/${this.courseId}/${this.module.id}/form`,
             {

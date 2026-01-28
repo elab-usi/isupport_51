@@ -77,12 +77,12 @@ export type CoreSearchGlobalSearchSearchArea = {
     category: CoreSearchGlobalSearchSearchAreaCategory;
 };
 
-export type CoreSearchGlobalSearchFilters = {
+export interface CoreSearchGlobalSearchFilters {
     searchAreaCategoryIds?: string[];
     searchAreaIds?: string[];
     courseIds?: number[];
     contextIds?: number[];
-};
+}
 
 /**
  * Service to perform global searches.

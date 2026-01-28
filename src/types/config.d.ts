@@ -13,16 +13,15 @@
 // limitations under the License.
 
 import { CoreColorScheme, CoreZoomLevel } from '@features/settings/services/settings-helper';
-import { CoreCustomMenuLocalizedCustomItem } from '@features/mainmenu/services/custommenu';
+import { CoreMainMenuLocalizedCustomItem } from '@features/mainmenu/services/mainmenu';
 import { CoreLoginSiteInfo, CoreSitesDemoSiteData } from '@services/sites';
 import { OpenFileAction } from '@singletons/opener';
 import { CoreLoginSiteFinderSettings, CoreLoginSiteSelectorListMethod } from '@features/login/services/login-helper';
 import { CoreDatabaseConfiguration } from '@classes/database/database-table';
 import { ToastDuration } from '@services/overlays/toasts';
-import { CoreWSOverride } from '@classes/sites/unauthenticated-site';
 
 /* eslint-disable @typescript-eslint/naming-convention */
-// It's important to keep EnvironmentConfig as an interface so it can be extended using "declare module".
+
 export interface EnvironmentConfig {
     app_id: string;
     appname: string;
@@ -61,8 +60,7 @@ export interface EnvironmentConfig {
     displayqronsitescreen?: boolean;
     forceOpenLinksIn?: 'app' | 'browser';
     iOSDefaultOpenFileAction?: OpenFileAction;
-    customMainMenuItems?: CoreCustomMenuLocalizedCustomItem[];
-    customUserMenuItems?: CoreCustomMenuLocalizedCustomItem[];
+    customMainMenuItems?: CoreMainMenuLocalizedCustomItem[];
     feedbackFormUrl?: string | false;
     a11yStatement?: string | false;
     legalDisclaimer?: string | false;
@@ -82,5 +80,4 @@ export interface EnvironmentConfig {
     clearIABSessionWhenAutoLogin?: 'android' | 'ios' | 'all'; // Clear the session every time a new IAB is opened with auto-login.
     disabledFeatures?: string; // Disabled features for the whole app, using the same format as tool_mobile_disabledfeatures.
     collapsibleItemsExpanded: boolean; // Expand or collapse the collapsible items by default.
-    wsOverrides: Record<string, CoreWSOverride[]>; // Overrides to apply to WS calls.
 }

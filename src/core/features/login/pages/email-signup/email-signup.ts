@@ -16,15 +16,16 @@ import { Component, ElementRef, OnInit, ChangeDetectorRef, inject, viewChild } f
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { CoreText } from '@singletons/text';
 import { CoreCountries, CoreCountry } from '@singletons/countries';
+import { CoreWS, CoreWSExternalWarning } from '@services/ws';
 import { Translate } from '@singletons';
 import { CoreSitePublicConfigResponse, CoreUnauthenticatedSite } from '@classes/sites/unauthenticated-site';
 import { CoreUserProfileFieldDelegate } from '@features/user/services/user-profile-field-delegate';
+
 import {
-    CoreLoginSignUp,
     AuthEmailSignupProfileFieldsCategory,
     AuthEmailSignupSettings,
-    CoreAuthSignupUserInfo,
-} from '@features/login/services/signup';
+    CoreLoginHelper,
+} from '@features/login/services/login-helper';
 import { CoreNavigator } from '@services/navigator';
 import { CoreForms } from '@singletons/form';
 import { CoreRecaptchaComponent } from '@components/recaptcha/recaptcha';
@@ -35,11 +36,11 @@ import { EMAIL_SIGNUP_FEATURE_NAME } from '@features/login/constants';
 import { CoreInputErrorsMessages } from '@components/input-errors/input-errors';
 import { CoreViewer } from '@features/viewer/services/viewer';
 import { CoreLoadings } from '@services/overlays/loadings';
+import { CorePromiseUtils } from '@singletons/promise-utils';
 import { CoreOpener } from '@singletons/opener';
 import { CoreAlerts } from '@services/overlays/alerts';
 import { CoreSharedModule } from '@/core/shared.module';
 import { CoreUserProfileFieldComponent } from '@features/user/components/user-profile-field/user-profile-field';
-import { CoreLoginHelper } from '@features/login/services/login-helper';
 
 /**
  * Page to signup using email.
@@ -134,7 +135,7 @@ export default class CoreLoginEmailSignupPage implements OnInit {
     }
 
     /**
-     * @inheritdoc
+     * Component initialized.
      */
     ngOnInit(): void {
         const siteUrl = CoreNavigator.getRouteParam<string>('siteUrl');
@@ -181,6 +182,8 @@ export default class CoreLoginEmailSignupPage implements OnInit {
 
     /**
      * Fetch the required data from the server.
+     *
+     * @returns Promise resolved when done.
      */
     protected async fetchData(): Promise<void> {
         try {
@@ -192,7 +195,16 @@ export default class CoreLoginEmailSignupPage implements OnInit {
             if (configValid) {
                 // Check content verification.
                 if (this.ageDigitalConsentVerification === undefined) {
-                    this.ageDigitalConsentVerification = await CoreLoginSignUp.isAgeVerificationEnabled(this.site);
+
+                    const result = await CorePromiseUtils.ignoreErrors(
+                        CoreWS.callAjax<IsAgeVerificationEnabledWSResponse>(
+                            'core_auth_is_age_digital_consent_verification_enabled',
+                            {},
+                            { siteUrl: this.site.getURL() },
+                        ),
+                    );
+
+                    this.ageDigitalConsentVerification = !!result?.status;
                 }
 
                 await this.getSignupSettings();
@@ -208,9 +220,11 @@ export default class CoreLoginEmailSignupPage implements OnInit {
 
     /**
      * Get signup settings from server.
+     *
+     * @returns Promise resolved when done.
      */
     protected async getSignupSettings(): Promise<void> {
-        this.settings = await CoreLoginSignUp.getEmailSignupSettings(this.site);
+        this.settings = await CoreLoginHelper.getEmailSignupSettings(this.site.getURL());
 
         if (CoreUserProfileFieldDelegate.hasRequiredUnsupportedField(this.settings.profilefields)) {
             this.allRequiredSupported = false;
@@ -218,7 +232,7 @@ export default class CoreLoginEmailSignupPage implements OnInit {
             throw new Error(Translate.instant('core.login.signuprequiredfieldnotsupported'));
         }
 
-        this.categories = CoreLoginSignUp.formatProfileFieldsForSignup(this.settings.profilefields);
+        this.categories = CoreLoginHelper.formatProfileFieldsForSignup(this.settings.profilefields);
 
         if (this.settings.recaptchapublickey) {
             this.captcha.recaptcharesponse = ''; // Reset captcha.
@@ -272,6 +286,7 @@ export default class CoreLoginEmailSignupPage implements OnInit {
      * Create account.
      *
      * @param e Event.
+     * @returns Promise resolved when done.
      */
     async create(e: Event): Promise<void> {
         e.preventDefault();
@@ -301,45 +316,46 @@ export default class CoreLoginEmailSignupPage implements OnInit {
 
         const modal = await CoreLoadings.show('core.sending', true);
 
-        const userInfo: CoreAuthSignupUserInfo = {
-            username: this.signupForm.value.username,
+        const params: SignupUserWSParams = {
+            username: this.signupForm.value.username.trim().toLowerCase(),
             password: this.signupForm.value.password,
-            firstname: this.signupForm.value.firstname,
-            lastname: this.signupForm.value.lastname,
-            email: this.signupForm.value.email,
-            city: this.signupForm.value.city,
+            firstname: CoreText.cleanTags(this.signupForm.value.firstname),
+            lastname: CoreText.cleanTags(this.signupForm.value.lastname),
+            email: this.signupForm.value.email.trim(),
+            city: CoreText.cleanTags(this.signupForm.value.city),
             country: this.signupForm.value.country,
         };
 
-        const redirect = this.siteConfig?.launchurl
-            ? await CoreLoginHelper.prepareForSSOLogin(this.site.getURL(), undefined, this.siteConfig.launchurl)
-            : undefined;
+        if (this.siteConfig?.launchurl) {
+            params.redirect = await CoreLoginHelper.prepareForSSOLogin(this.site.getURL(), undefined, this.siteConfig.launchurl);
+        }
 
         // Get the recaptcha response (if needed).
-        let recaptchaResponse: string | undefined;
         if (this.settings?.recaptchapublickey && this.captcha.recaptcharesponse) {
-            recaptchaResponse = this.captcha.recaptcharesponse;
+            params.recaptcharesponse = this.captcha.recaptcharesponse;
         }
 
         try {
             // Get the data for the custom profile fields.
-            const customProfileFields = await CoreUserProfileFieldDelegate.getDataForFields(
+            params.customprofilefields = await CoreUserProfileFieldDelegate.getDataForFields(
                 this.settings?.profilefields,
                 true,
                 'email',
                 this.signupForm.value,
             );
 
-            const result = await CoreLoginSignUp.emailSignup(userInfo, this.site, {
-                recaptchaResponse, customProfileFields, redirect,
-            });
+            const result = await CoreWS.callAjax<SignupUserWSResult>(
+                'auth_email_signup_user',
+                params,
+                { siteUrl: this.site.getURL() },
+            );
 
             if (result.success) {
 
                 CoreForms.triggerFormSubmittedEvent(this.signupFormElement(), true);
 
-                // Show alert and go back.
-                const message = Translate.instant('core.login.emailconfirmsent', { $a: userInfo.email.trim() });
+                // Show alert and ho back.
+                const message = Translate.instant('core.login.emailconfirmsent', { $a: params.email });
                 CoreAlerts.show({ header: Translate.instant('core.success'), message });
                 CoreNavigator.back();
             } else {
@@ -395,6 +411,7 @@ export default class CoreLoginEmailSignupPage implements OnInit {
      * Verify Age.
      *
      * @param e Event.
+     * @returns Promise resolved when done.
      */
     async verifyAge(e: Event): Promise<void> {
         e.preventDefault();
@@ -408,13 +425,16 @@ export default class CoreLoginEmailSignupPage implements OnInit {
 
         const modal = await CoreLoadings.show('core.sending', true);
 
+        const params = this.ageVerificationForm.value;
+
+        params.age = parseInt(params.age, 10); // Use just the integer part.
+
         try {
-            const age = parseInt(this.ageVerificationForm.value.age, 10);
-            const isMinor = await CoreLoginSignUp.isMinor(age, this.ageVerificationForm.value.country, this.site);
+            const result = await CoreWS.callAjax<IsMinorWSResult>('core_auth_is_minor', params, { siteUrl: this.site.getURL() });
 
             CoreForms.triggerFormSubmittedEvent(this.ageFormElement(), true);
 
-            if (!isMinor) {
+            if (!result.status) {
                 if (this.countryControl.value) {
                     this.signUpCountryControl?.setValue(this.countryControl.value);
                 }
@@ -434,3 +454,46 @@ export default class CoreLoginEmailSignupPage implements OnInit {
     }
 
 }
+
+/**
+ * Result of WS core_auth_is_age_digital_consent_verification_enabled.
+ */
+type IsAgeVerificationEnabledWSResponse = {
+    status: boolean; // True if digital consent verification is enabled, false otherwise.
+};
+
+/**
+ * Params for WS auth_email_signup_user.
+ */
+type SignupUserWSParams = {
+    username: string; // Username.
+    password: string; // Plain text password.
+    firstname: string; // The first name(s) of the user.
+    lastname: string; // The family name of the user.
+    email: string; // A valid and unique email address.
+    city?: string; // Home city of the user.
+    country?: string; // Home country code.
+    recaptchachallengehash?: string; // Recaptcha challenge hash.
+    recaptcharesponse?: string; // Recaptcha response.
+    customprofilefields?: { // User custom fields (also known as user profile fields).
+        type: string; // The type of the custom field.
+        name: string; // The name of the custom field.
+        value: unknown; // Custom field value, can be an encoded json if required.
+    }[];
+    redirect?: string; // Redirect the user to this site url after confirmation.
+};
+
+/**
+ * Result of WS auth_email_signup_user.
+ */
+type SignupUserWSResult = {
+    success: boolean; // True if the user was created false otherwise.
+    warnings?: CoreWSExternalWarning[];
+};
+
+/**
+ * Result of WS core_auth_is_minor.
+ */
+type IsMinorWSResult = {
+    status: boolean; // True if the user is considered to be a digital minor, false if not.
+};

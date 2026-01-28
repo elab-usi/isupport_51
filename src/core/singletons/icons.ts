@@ -148,7 +148,7 @@ export class CoreIcons {
      * @param icon Icon Name.
      */
     static validateIcon(font: string, library: string, icon: string): void {
-        if (!CoreConstants.isDevOrTestingBuild()) {
+        if (!CoreConstants.BUILD.isDevelopment && !CoreConstants.BUILD.isTesting) {
             return;
         }
 

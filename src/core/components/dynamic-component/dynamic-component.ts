@@ -31,7 +31,7 @@ import {
     EventEmitter,
     OutputEmitterRef,
 } from '@angular/core';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { CorePromisedValue } from '@classes/promised-value';
 
 import { CoreAngular } from '@singletons/angular';
@@ -163,7 +163,7 @@ export class CoreDynamicComponent<ComponentClass> implements OnChanges, DoCheck,
             return;
         }
 
-        return instance[method](...params);
+        return instance[method].apply(instance, params);
     }
 
     /**

@@ -83,6 +83,7 @@ import { Md5 } from 'ts-md5/dist/md5';
 // Import core classes that can be useful for site plugins.
 import { CoreSyncBaseProvider } from '@classes/base-sync';
 import { CoreArray } from '@singletons/array';
+import { CoreCache } from '@classes/cache';
 import { CoreColors } from '@singletons/colors';
 import { CoreCountries } from '@singletons/countries';
 import { CoreDelegate } from '@classes/delegate';
@@ -300,6 +301,11 @@ export class CoreCompileProvider {
         instance['untracked'] = untracked;
         instance['effect'] = options.effectWrapper ?? effectWithInjectionContext(injector);
 
+        /**
+         * @deprecated since 4.1, plugins should use CoreNetwork instead.
+         * Keeping this a bit more to avoid plugins breaking.
+         */
+        instance['Network'] = CoreNetwork.instance;
         instance['CoreNetwork'] = CoreNetwork.instance;
         instance['CoreArray'] = CoreArray;
         instance['CoreColors'] = CoreColors;
@@ -325,6 +331,7 @@ export class CoreCompileProvider {
         instance['CoreUtils'] = CoreUtils;
         instance['CoreWait'] = CoreWait;
         instance['CoreWindow'] = CoreWindow;
+        instance['CoreCache'] = CoreCache; // @deprecated since 4.4, plugins should use plain objects instead.
         instance['CoreDelegate'] = CoreDelegate;
         instance['CorePromisedValue'] = CorePromisedValue;
 

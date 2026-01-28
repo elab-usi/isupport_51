@@ -16,7 +16,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 import { CoreText } from '@singletons/text';
 import { CoreLogger } from '@singletons/logger';
-import { CoreTimeConstants } from '@/core/constants';
+import { CoreConstants } from '@/core/constants';
 
 /**
  * Pipe to convert a number of seconds to Hours:Minutes:Seconds.
@@ -40,7 +40,7 @@ export class CoreSecondsToHMSPipe implements PipeTransform {
      * @param seconds Number of seconds.
      * @returns Formatted seconds.
      */
-    transform(seconds: string | number, showHours = true): string {
+    transform(seconds: string | number, showHours: boolean = true): string {
         if (typeof seconds === 'string') {
             // Convert the value to a number.
             const numberSeconds = parseInt(seconds, 10);
@@ -57,10 +57,10 @@ export class CoreSecondsToHMSPipe implements PipeTransform {
         // Don't allow decimals.
         seconds = Math.floor(seconds);
 
-        const hours = Math.floor(seconds / CoreTimeConstants.SECONDS_HOUR);
-        seconds -= hours * CoreTimeConstants.SECONDS_HOUR;
-        const minutes = Math.floor(seconds / CoreTimeConstants.SECONDS_MINUTE);
-        seconds -= minutes * CoreTimeConstants.SECONDS_MINUTE;
+        const hours = Math.floor(seconds / CoreConstants.SECONDS_HOUR);
+        seconds -= hours * CoreConstants.SECONDS_HOUR;
+        const minutes = Math.floor(seconds / CoreConstants.SECONDS_MINUTE);
+        seconds -= minutes * CoreConstants.SECONDS_MINUTE;
 
         return showHours
             ? `${CoreText.twoDigits(hours)}:${CoreText.twoDigits(minutes)}:${CoreText.twoDigits(seconds)}`

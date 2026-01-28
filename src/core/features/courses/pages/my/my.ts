@@ -14,7 +14,7 @@
 
 import { AddonBlockMyOverviewComponent } from '@addons/block/myoverview/components/myoverview/myoverview';
 import { Component, effect, OnDestroy, OnInit, viewChild, inject } from '@angular/core';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { PageLoadsManager } from '@classes/page-loads-manager';
 import { CorePromisedValue } from '@classes/promised-value';
 import { CoreBlockComponent } from '@features/block/components/block/block';
@@ -69,10 +69,7 @@ export default class CoreCoursesMyPage implements OnInit, OnDestroy, AsyncDirect
     myPageCourses = CoreCoursesMyPageName.COURSES;
     hasSideBlocks = false;
 
-    protected sideBlocks?: CoreCourseBlock[];
-    protected supportsMyParam = false;
     protected updateSiteObserver: CoreEventObserver;
-    protected blockSubscription: Subscription;
     protected onReadyPromise = new CorePromisedValue<void>();
     protected loadsManagerSubscription: Subscription;
     protected logView: () => void;
@@ -111,15 +108,6 @@ export default class CoreCoursesMyPage implements OnInit, OnDestroy, AsyncDirect
                 url: '/my/courses.php',
             });
         });
-
-        // Re-evaluate if blocks are supported if the list of handlers changed (e.g. site plugins added).
-        this.blockSubscription = CoreBlockDelegate.blocksUpdateObservable.subscribe(async (): Promise<void> => {
-            if (!this.sideBlocks) {
-                return;
-            }
-
-            this.hasSideBlocks = this.supportsMyParam && CoreBlockDelegate.hasSupportedBlock(this.sideBlocks);
-        });
     }
 
     /**
@@ -127,7 +115,6 @@ export default class CoreCoursesMyPage implements OnInit, OnDestroy, AsyncDirect
      */
     async ngOnInit(): Promise<void> {
         this.downloadCoursesEnabled = !CoreCourses.isDownloadCoursesDisabledInSite();
-        this.supportsMyParam = !!CoreSites.getCurrentSite()?.isVersionGreaterEqualThan('4.0');
 
         CoreSites.loginNavigationFinished();
 
@@ -144,11 +131,13 @@ export default class CoreCoursesMyPage implements OnInit, OnDestroy, AsyncDirect
         const available = await CoreCoursesDashboard.isAvailable();
         const disabled = CoreCourses.isMyCoursesDisabledInSite();
 
+        const supportsMyParam = !!CoreSites.getCurrentSite()?.isVersionGreaterEqualThan('4.0');
+
         if (available && !disabled) {
             try {
                 const blocks = await loadWatcher.watchRequest(
                     CoreCoursesDashboard.getDashboardBlocksObservable({
-                        myPage: this.supportsMyParam ? this.myPageCourses : undefined,
+                        myPage: supportsMyParam ? this.myPageCourses : undefined,
                         readingStrategy: loadWatcher.getReadingStrategy(),
                     }),
                 );
@@ -156,12 +145,11 @@ export default class CoreCoursesMyPage implements OnInit, OnDestroy, AsyncDirect
                 // My overview block should always be in main blocks, but check side blocks too just in case.
                 this.loadedBlock = blocks.mainBlocks.concat(blocks.sideBlocks).find((block) =>
                     block.name === ADDON_BLOCK_MYOVERVIEW_BLOCK_NAME);
-                this.sideBlocks = blocks.sideBlocks;
-                this.hasSideBlocks = this.supportsMyParam && CoreBlockDelegate.hasSupportedBlock(this.sideBlocks);
+                this.hasSideBlocks = supportsMyParam && CoreBlockDelegate.hasSupportedBlock(blocks.sideBlocks);
 
                 await CoreWait.nextTicks(2);
 
-                if (!this.loadedBlock && !this.supportsMyParam) {
+                if (!this.loadedBlock && !supportsMyParam) {
                     // In old sites, display the block even if not found in Dashboard.
                     // This is because the "My courses" page doesn't exist in the site so it can't be configured.
                     this.loadFallbackBlock();
@@ -224,7 +212,6 @@ export default class CoreCoursesMyPage implements OnInit, OnDestroy, AsyncDirect
     ngOnDestroy(): void {
         this.updateSiteObserver?.off();
         this.loadsManagerSubscription.unsubscribe();
-        this.blockSubscription.unsubscribe();
     }
 
     /**

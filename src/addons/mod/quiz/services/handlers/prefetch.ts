@@ -63,7 +63,7 @@ export class AddonModQuizPrefetchHandlerService extends CoreCourseActivityPrefet
         courseId: number,
         dirPath?: string,
         single?: boolean,
-        canStart = true,
+        canStart: boolean = true,
     ): Promise<void> {
         // Same implementation for download and prefetch.
         return this.prefetch(module, courseId, single, dirPath, canStart);
@@ -211,7 +211,7 @@ export class AddonModQuizPrefetchHandlerService extends CoreCourseActivityPrefet
         courseId: number,
         single?: boolean,
         dirPath?: string,
-        canStart = true,
+        canStart: boolean = true,
     ): Promise<void> {
         if (module.attemptFinished) {
             // Delete the value so it does not block anything if true.

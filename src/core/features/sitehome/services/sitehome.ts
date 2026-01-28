@@ -176,9 +176,7 @@ export class CoreSiteHomeProvider {
                     add = !!CoreSites.getCurrentSite()?.getStoredConfig('newsitems');
                     break;
                 case FrontPageItemNames['COMBO_LIST']:
-                    itemNumber = FrontPageItemNames['LIST_OF_CATEGORIES'];
-                    add = true;
-                    break;
+                    itemNumber = FrontPageItemNames['LIST_OF_CATEGORIES']; // Do not break here.
                 case FrontPageItemNames['LIST_OF_CATEGORIES']:
                 case FrontPageItemNames['LIST_OF_COURSE']:
                 case FrontPageItemNames['ENROLLED_COURSES']:

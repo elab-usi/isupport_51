@@ -16,7 +16,7 @@ import { Injectable } from '@angular/core';
 import {
     CoreUserProfileHandlerType,
     CoreUserProfileHandler,
-    CoreUserProfileListHandlerData,
+    CoreUserProfileHandlerData,
     CoreUserDelegateContext,
 } from '@features/user/services/user-delegate';
 import { CoreNavigator } from '@services/navigator';
@@ -30,7 +30,7 @@ import { CORE_REPORT_BUILDER_PAGE_NAME } from '@features/reportbuilder/constants
 @Injectable({ providedIn: 'root' })
 export class CoreReportBuilderHandlerService implements CoreUserProfileHandler {
 
-    readonly type = CoreUserProfileHandlerType.LIST_ITEM;
+    type = CoreUserProfileHandlerType.LIST_ITEM;
     cacheEnabled = true;
     name = 'CoreReportBuilderDelegate';
     priority = 350;
@@ -57,7 +57,7 @@ export class CoreReportBuilderHandlerService implements CoreUserProfileHandler {
     /**
      * @inheritdoc
      */
-    getDisplayData(): CoreUserProfileListHandlerData {
+    getDisplayData(): CoreUserProfileHandlerData {
         return {
             class: 'core-report-builder',
             icon: 'fas-rectangle-list',

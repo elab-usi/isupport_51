@@ -18,7 +18,7 @@ import { FileEntry, DirectoryEntry, Entry, Metadata, IFile } from '@awesome-cord
 
 import { CoreMimetype } from '@singletons/mimetype';
 import { CoreFileUtils } from '@singletons/file-utils';
-import { CoreBytesConstants, CoreConstants } from '@/core/constants';
+import { CoreConstants } from '@/core/constants';
 import { CoreError } from '@classes/errors/error';
 
 import { CoreLogger } from '@singletons/logger';
@@ -84,13 +84,7 @@ export class CoreFileProvider {
     static readonly TMPFOLDER = 'tmp';
     static readonly NO_SITE_FOLDER = 'nosite';
 
-    static readonly CHUNK_SIZE = CoreBytesConstants.MEGABYTE; // Same chunk size as Ionic Native.
-
-    protected static readonly IOS_FREE_SPACE_THRESHOLD = 500 * CoreBytesConstants.MEGABYTE;
-
-    static readonly MINIMUM_FREE_SPACE = 10 * CoreBytesConstants.MEGABYTE;
-    static readonly WIFI_DOWNLOAD_DEFAULT_CONFIRMATION_THRESHOLD = 100 * CoreBytesConstants.MEGABYTE;
-    static readonly DOWNLOAD_DEFAULT_CONFIRMATION_THRESHOLD = 10 * CoreBytesConstants.MEGABYTE;
+    static readonly CHUNK_SIZE = 1048576; // 1 MB. Same chunk size as Ionic Native.
 
     protected logger = CoreLogger.getInstance('CoreFileProvider');
     protected initialized = false;
@@ -463,34 +457,7 @@ export class CoreFileProvider {
             return Number(size);
         }
 
-        return Number(size) * CoreBytesConstants.KILOBYTE;
-    }
-
-    /**
-     * Calculates and returns the available free space in bytes, with platform-specific logic.
-     *
-     * On Android, always returns the calculated available bytes.
-     * On iOS, returns the available bytes only if the free space is below a certain threshold
-     * (`IOS_FREE_SPACE_THRESHOLD`) or if the requested size is more than half of the available space.
-     * Otherwise, returns `null` to indicate that the calculation may not be accurate.
-     *
-     * @param size - The size in bytes that is intended to be used or downloaded.
-     * @returns A promise that resolves to the number of available bytes, or `null` if the value is not reliable.
-     */
-    async getPlatformAvailableBytes(size: number): Promise<number | null> {
-        const availableBytes = await CoreFile.calculateFreeSpace();
-
-        if (CorePlatform.isAndroid()) {
-            return availableBytes;
-        }
-
-        // Space calculation is not accurate on iOS, but it gets more accurate when space is lower.
-        // We'll only use it when space is <500MB, or we're downloading more than twice the reported space.
-        if (availableBytes < CoreFileProvider.IOS_FREE_SPACE_THRESHOLD || size > availableBytes / 2) {
-            return availableBytes;
-        } else {
-            return null;
-        }
+        return Number(size) * 1024;
     }
 
     /**
@@ -667,7 +634,7 @@ export class CoreFileProvider {
         file: Blob,
         path: string,
         onProgress?: CoreFileProgressFunction,
-        offset = 0,
+        offset: number = 0,
         append?: boolean,
     ): Promise<FileEntry> {
         offset = offset || 0;
@@ -929,7 +896,7 @@ export class CoreFileProvider {
      * @returns Plain object containing the file name and directory.
      * @deprecated since 5.0. Use CoreFileUtils.getFileAndDirectoryFromPath instead.
      */
-    getFileAndDirectoryFromPath(path: string): { directory: string; name: string } {
+    getFileAndDirectoryFromPath(path: string): {directory: string; name: string} {
         return CoreFileUtils.getFileAndDirectoryFromPath(path);
     }
 
@@ -1004,7 +971,7 @@ export class CoreFileProvider {
         path: string,
         destFolder?: string,
         onProgress?: (progress: ProgressEvent) => void,
-        recreateDir = true,
+        recreateDir: boolean = true,
     ): Promise<void> {
         // Get the source file.
         const fileEntry = await this.getFile(path);
@@ -1253,7 +1220,7 @@ export class CoreFileProvider {
                 return;
             }
 
-            const filesMap: { [fullPath: string]: FileEntry } = {};
+            const filesMap: {[fullPath: string]: FileEntry} = {};
             const promises: Promise<void>[] = [];
 
             // Index the received files by fullPath and ignore the invalid ones.

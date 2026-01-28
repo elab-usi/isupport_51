@@ -32,7 +32,7 @@ type MimeTypeInfo = {
     type: string;
     icon?: string;
     groups?: string[];
-    // eslint-disable-next-line id-denylist
+    // eslint-disable-next-line id-blacklist
     string?: string;
     deprecated?: string; // Deprecated mimetype name.
 };

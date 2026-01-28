@@ -44,7 +44,6 @@ import {
 } from '@features/courses/constants';
 import { CoreAlerts } from '@services/overlays/alerts';
 import { Translate } from '@singletons';
-import { CoreCourseDownloadStatusIcon } from '@features/course/constants';
 
 const FILTER_PRIORITY: AddonBlockMyOverviewTimeFilters[] =
     ['all', 'inprogress', 'future', 'past', 'favourite', 'allincludinghidden', 'hidden', 'custom'];
@@ -66,7 +65,7 @@ export class AddonBlockMyOverviewComponent extends CoreBlockBaseComponent implem
     filteredCourses: CoreEnrolledCourseDataWithExtraInfoAndOptions[] = [];
 
     prefetchCoursesData: CorePrefetchStatusInfo = {
-        icon: CoreCourseDownloadStatusIcon.NOT_DOWNLOADABLE,
+        icon: '',
         statusTranslatable: 'core.loading',
         status: DownloadStatus.DOWNLOADABLE_NOT_DOWNLOADED,
         loading: true,

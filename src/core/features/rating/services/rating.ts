@@ -219,10 +219,10 @@ export class CoreRatingProvider {
         ratingArea: string,
         itemId: number,
         scaleId: number,
-        sort = 'timemodified',
+        sort: string = 'timemodified',
         courseId?: number,
         siteId?: string,
-        ignoreCache = false,
+        ignoreCache: boolean = false,
     ): Promise<CoreRatingItemRating[]> {
         const site = await CoreSites.getSite(siteId);
 
@@ -285,7 +285,7 @@ export class CoreRatingProvider {
         ratingArea: string,
         itemId: number,
         scaleId: number,
-        sort = 'timemodified',
+        sort: string = 'timemodified',
         siteId?: string,
     ): Promise<void> {
         const site = await CoreSites.getSite(siteId);
@@ -399,7 +399,9 @@ export class CoreRatingProvider {
         const ratingsResults = await Promise.all(promises);
 
         if (!site.isVersionGreaterEqualThan(['3.6.5', '3.7.1', '3.8'])) {
-            const userIds = ratingsResults.flat().map((rating) => rating.userid);
+            const ratings: CoreRatingItemRating[] = [].concat.apply([], ratingsResults);
+
+            const userIds = ratings.map((rating) => rating.userid);
 
             await CoreUser.prefetchProfiles(userIds, courseId, site.id);
         }

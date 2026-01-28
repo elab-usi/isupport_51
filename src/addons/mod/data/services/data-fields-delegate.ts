@@ -111,10 +111,10 @@ export interface AddonModDataFieldHandler extends CoreDelegateHandler {
     /**
      * Override field content data with offline submission.
      *
-     * @param originalContent Original data to be overridden.
+     * @param originalContent Original data to be overriden.
      * @param offlineContent Array with all the offline data to override.
      * @param offlineFiles Array with all the offline files in the field.
-     * @returns Data overridden
+     * @returns Data overriden
      */
     overrideData?(
         originalContent: AddonModDataEntryField,
@@ -247,10 +247,10 @@ export class AddonModDataFieldsDelegateService extends CoreDelegate<AddonModData
      * Override field content data with offline submission.
      *
      * @param field Defines the field to be rendered.
-     * @param originalContent Original data to be overridden.
+     * @param originalContent Original data to be overriden.
      * @param offlineContent Array with all the offline data to override.
      * @param offlineFiles Array with all the offline files in the field.
-     * @returns Data overridden
+     * @returns Data overriden
      */
     overrideData(
         field: AddonModDataField,

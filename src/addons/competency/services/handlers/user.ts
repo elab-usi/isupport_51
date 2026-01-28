@@ -19,7 +19,7 @@ import { CoreUserProfile } from '@features/user/services/user';
 import {
     CoreUserProfileHandler,
     CoreUserProfileHandlerType,
-    CoreUserProfileListHandlerData,
+    CoreUserProfileHandlerData,
     CoreUserDelegateContext,
 } from '@features/user/services/user-delegate';
 import { PARTICIPANTS_PAGE_NAME } from '@features/user/constants';
@@ -34,9 +34,10 @@ import { AddonCompetency } from '../competency';
 @Injectable( { providedIn: 'root' })
 export class AddonCompetencyUserHandlerService implements CoreUserProfileHandler {
 
-    readonly type = CoreUserProfileHandlerType.LIST_ITEM;
-    name = 'AddonCompetency:fakename'; // This name doesn't match any disabled feature, they'll be checked in isEnabledForContext.
+    // This name doesn't match any disabled feature, they'll be checked in isEnabledForContext.
+    name = 'AddonCompetency:fakename';
     priority = 100;
+    type = CoreUserProfileHandlerType.LIST_ITEM;
     cacheEnabled = true;
 
     /**
@@ -88,7 +89,7 @@ export class AddonCompetencyUserHandlerService implements CoreUserProfileHandler
     /**
      * @inheritdoc
      */
-    getDisplayData(user: CoreUserProfile, context: CoreUserDelegateContext): CoreUserProfileListHandlerData {
+    getDisplayData(user: CoreUserProfile, context: CoreUserDelegateContext): CoreUserProfileHandlerData {
         if (context !== CoreUserDelegateContext.COURSE) {
             return {
                 icon: 'fas-route',

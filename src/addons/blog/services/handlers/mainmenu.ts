@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Injectable } from '@angular/core';
-import { CoreMainMenuHandler, CoreMainMenuPageNavHandlerData } from '@features/mainmenu/services/mainmenu-delegate';
+import { CoreMainMenuHandler, CoreMainMenuHandlerData } from '@features/mainmenu/services/mainmenu-delegate';
 import { makeSingleton } from '@singletons';
 import { AddonBlog } from '../blog';
 import { ADDON_BLOG_MAINMENU_PAGE_NAME } from '@addons/blog/constants';
@@ -37,7 +37,7 @@ export class AddonBlogMainMenuHandlerService implements CoreMainMenuHandler {
     /**
      * @inheritdoc
      */
-    getDisplayData(): CoreMainMenuPageNavHandlerData {
+    getDisplayData(): CoreMainMenuHandlerData {
         return {
             icon: 'far-newspaper',
             title: 'addon.blog.siteblogheading',

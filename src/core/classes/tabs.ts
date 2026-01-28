@@ -35,7 +35,7 @@ import { CoreDom } from '@singletons/dom';
 import { CoreWait } from '@singletons/wait';
 import { CoreError } from './errors/error';
 import { CorePromisedValue } from './promised-value';
-import type { AsyncDirective } from '../types/async-directive';
+import { AsyncDirective } from './async-directive';
 import { CoreDirectivesRegistry } from '@singletons/directives-registry';
 import { Swiper } from 'swiper';
 import { SwiperOptions } from 'swiper/types';

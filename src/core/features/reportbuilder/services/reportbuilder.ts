@@ -228,9 +228,9 @@ export type CoreReportBuilderRetrieveReportWSResponse = {
     warnings?: CoreWSExternalWarning[];
 };
 
-export type CoreReportBuilderRetrieveReportMapped = Omit<CoreReportBuilderRetrieveReportWSResponse, 'details'> & {
+export interface CoreReportBuilderRetrieveReportMapped extends Omit<CoreReportBuilderRetrieveReportWSResponse, 'details'> {
     details: CoreReportBuilderReportDetail;
-};
+}
 
 export type CoreReportBuilderReportDataWSResponse = {
     headers: string[]; // Headers.
@@ -256,13 +256,14 @@ export type CoreReportBuilderViewReportWSResponse = {
     warnings?: CoreWSExternalWarning[];
 };
 
-export type CoreReportBuilderReportDetail = Omit<CoreReportBuilderReportWSResponse, 'settingsdata'> & {
+export interface CoreReportBuilderReportDetail extends Omit<CoreReportBuilderReportWSResponse, 'settingsdata'> {
     settingsdata: CoreReportBuilderReportDetailSettingsData;
-};
+}
 
 export type CoreReportBuilderReportDetailSettingsData = {
     cardviewShowFirstTitle: boolean;
     cardviewVisibleColumns: number;
 };
 
-export type CoreReportBuilderReport = CoreReportBuilderReportWSResponse;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CoreReportBuilderReport extends CoreReportBuilderReportWSResponse {}

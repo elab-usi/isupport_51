@@ -1,4 +1,4 @@
-@app_parallel_run_calendar @addon_block_calendar_upcoming @app @block @block_calendar_upcoming @javascript
+@addon_block_calendar_upcoming @app @block @block_calendar_upcoming @javascript
 Feature: View the calendar upcoming block and check
     it links to the calendar upcoming events page
 
@@ -24,7 +24,6 @@ Feature: View the calendar upcoming block and check
     Then the header should be "Calendar" in the app
     And I should find "There are no events" in the app
 
-  @disabled_features
   Scenario: Block is included in disabled features
     # Add another block just to ensure there is something in the block region and the drawer is displayed.
     Given the following "blocks" exist:

@@ -15,7 +15,7 @@
 import { Component, Input } from '@angular/core';
 import { ContextLevel } from '@/core/constants';
 import { CorePromisedValue } from '@classes/promised-value';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 
 /**
  * Base class for editor implementations.

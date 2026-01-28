@@ -1,4 +1,4 @@
-@app_parallel_run_comments @addon_block_comments @app @block @block_comments @javascript
+@addon_block_comments @app @block @block_comments @javascript
 Feature: View the comments block and check
     it links to the correct comments page
 
@@ -36,7 +36,6 @@ Feature: View the comments block and check
     And I should find "No comments" in the app
     And I should find "Acceptance test site" in the app
 
-  @disabled_features
   Scenario: Block is included in disabled features
     # Add another block just to ensure there is something in the block region and the drawer is displayed.
     Given the following "blocks" exist:

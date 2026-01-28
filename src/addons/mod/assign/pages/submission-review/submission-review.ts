@@ -84,12 +84,12 @@ export default class AddonModAssignSubmissionReviewPage implements OnInit, OnDes
      * @inheritdoc
      */
     ngOnInit(): void {
-        this.route.queryParams.subscribe(() => {
+        this.route.queryParams.subscribe((queryParams) => {
             try {
                 this.moduleId = CoreNavigator.getRequiredRouteNumberParam('cmId');
                 this.courseId = CoreNavigator.getRequiredRouteNumberParam('courseId');
                 this.submitId = CoreNavigator.getRouteNumberParam('submitId') || 0;
-                this.blindId = CoreNavigator.getRouteNumberParam('blindId');
+                this.blindId = CoreNavigator.getRouteNumberParam('blindId', { queryParams });
                 const groupId = CoreNavigator.getRequiredRouteNumberParam('groupId');
                 const selectedStatus = CoreNavigator.getRouteParam<AddonModAssignListFilterName>('selectedStatus');
                 const submissionsSource = CoreRoutedItemsManagerSourcesTracker.getOrCreateSource(

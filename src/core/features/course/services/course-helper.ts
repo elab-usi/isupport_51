@@ -28,7 +28,7 @@ import {
     CoreCourseAnyModuleData,
     CoreCourseModuleOrSection,
 } from './course';
-import { DownloadStatus, ContextLevel, CoreTimeConstants } from '@/core/constants';
+import { CoreConstants, DownloadStatus, ContextLevel } from '@/core/constants';
 import { CoreLogger } from '@singletons/logger';
 import { ApplicationInit, makeSingleton, Translate } from '@singletons';
 import { CoreFilepool } from '@services/filepool';
@@ -79,7 +79,6 @@ import {
     CORE_COURSE_ALL_SECTIONS_ID,
     CORE_COURSE_STEALTH_MODULES_SECTION_ID,
     CORE_COURSE_COMPONENT,
-    CoreCourseDownloadStatusIcon,
 } from '../constants';
 import { CorePromiseUtils } from '@singletons/promise-utils';
 import { CoreOpener, CoreOpenerOpenFileOptions } from '@singletons/opener';
@@ -133,7 +132,7 @@ export type CoreCourseCoursesProgress = {
 export type CorePrefetchStatusInfo = {
     status: DownloadStatus; // Status of the prefetch.
     statusTranslatable: string; // Status translatable string.
-    icon: CoreCourseDownloadStatusIcon; // Icon based on the status.
+    icon: string; // Icon based on the status.
     loading: boolean; // If it's a loading status.
     badge?: string; // Progress badge string if any.
     badgeA11yText?: string; // Description of the badge if any.
@@ -285,8 +284,8 @@ export class CoreCourseHelperProvider {
         section: CoreCourseSection,
         courseId: number,
         refresh?: boolean,
-        checkUpdates = true,
-    ): Promise<{ statusData: CoreCourseModulesStatus; section: CoreCourseSectionWithStatus }> {
+        checkUpdates: boolean = true,
+    ): Promise<{statusData: CoreCourseModulesStatus; section: CoreCourseSectionWithStatus}> {
         if (section.id === CORE_COURSE_ALL_SECTIONS_ID) {
             throw new CoreError('Invalid section');
         }
@@ -355,7 +354,7 @@ export class CoreCourseHelperProvider {
         const siteId = CoreSites.getCurrentSiteId();
 
         data.downloadSucceeded = false;
-        data.icon = CoreCourseDownloadStatusIcon.DOWNLOADING;
+        data.icon = CoreConstants.ICON_DOWNLOADING;
         data.status = DownloadStatus.DOWNLOADING;
         data.loading = true;
         data.statusTranslatable = 'core.downloading';
@@ -1042,7 +1041,7 @@ export class CoreCourseHelperProvider {
     ): Promise<CorePrefetchStatusInfo> {
         if (!courses || courses.length <= 0) {
             // Not enough courses.
-            prefetch.icon = CoreCourseDownloadStatusIcon.NOT_DOWNLOADABLE;
+            prefetch.icon = '';
 
             return prefetch;
         }
@@ -1053,7 +1052,7 @@ export class CoreCourseHelperProvider {
 
         if (prefetch.loading) {
             // It seems all courses are being downloaded, show a download button instead.
-            prefetch.icon = CoreCourseDownloadStatusIcon.NOT_DOWNLOADED;
+            prefetch.icon = CoreConstants.ICON_NOT_DOWNLOADED;
         }
 
         return prefetch;
@@ -1168,7 +1167,7 @@ export class CoreCourseHelperProvider {
         prefetch: CorePrefetchStatusInfo,
     ): Promise<void> {
         prefetch.loading = true;
-        prefetch.icon = CoreCourseDownloadStatusIcon.DOWNLOADING;
+        prefetch.icon = CoreConstants.ICON_DOWNLOADING;
         prefetch.badge = '';
 
         const prefetchOptions = {
@@ -1182,7 +1181,7 @@ export class CoreCourseHelperProvider {
 
         try {
             await this.confirmAndPrefetchCourses(courses, prefetchOptions);
-            prefetch.icon = CoreCourseDownloadStatusIcon.OUTDATED;
+            prefetch.icon = CoreConstants.ICON_OUTDATED;
         } finally {
             prefetch.loading = false;
             prefetch.badge = '';
@@ -1276,21 +1275,21 @@ export class CoreCourseHelperProvider {
      * @param trustDownload True to show download success, false to show an outdated status when downloaded.
      * @returns Icon name.
      */
-    protected getPrefetchStatusIcon(status: DownloadStatus, trustDownload = false): CoreCourseDownloadStatusIcon {
+    protected getPrefetchStatusIcon(status: DownloadStatus, trustDownload: boolean = false): string {
         if (status === DownloadStatus.DOWNLOADABLE_NOT_DOWNLOADED) {
-            return CoreCourseDownloadStatusIcon.NOT_DOWNLOADED;
+            return CoreConstants.ICON_NOT_DOWNLOADED;
         }
         if (status === DownloadStatus.OUTDATED || (status === DownloadStatus.DOWNLOADED && !trustDownload)) {
-            return CoreCourseDownloadStatusIcon.OUTDATED;
+            return CoreConstants.ICON_OUTDATED;
         }
         if (status === DownloadStatus.DOWNLOADED && trustDownload) {
-            return CoreCourseDownloadStatusIcon.DOWNLOADED;
+            return CoreConstants.ICON_DOWNLOADED;
         }
         if (status === DownloadStatus.DOWNLOADING) {
-            return CoreCourseDownloadStatusIcon.DOWNLOADING;
+            return CoreConstants.ICON_DOWNLOADING;
         }
 
-        return CoreCourseDownloadStatusIcon.DOWNLOADING;
+        return CoreConstants.ICON_DOWNLOADING;
     }
 
     /**
@@ -1329,13 +1328,13 @@ export class CoreCourseHelperProvider {
         let statusIcon: string | undefined;
         switch (status) {
             case DownloadStatus.DOWNLOADABLE_NOT_DOWNLOADED:
-                statusIcon = CoreCourseDownloadStatusIcon.NOT_DOWNLOADED;
+                statusIcon = CoreConstants.ICON_NOT_DOWNLOADED;
                 break;
             case DownloadStatus.DOWNLOADING:
-                statusIcon = CoreCourseDownloadStatusIcon.DOWNLOADING;
+                statusIcon = CoreConstants.ICON_DOWNLOADING;
                 break;
             case DownloadStatus.OUTDATED:
-                statusIcon = CoreCourseDownloadStatusIcon.OUTDATED;
+                statusIcon = CoreConstants.ICON_OUTDATED;
                 break;
             case DownloadStatus.DOWNLOADED:
                 break;
@@ -1385,7 +1384,7 @@ export class CoreCourseHelperProvider {
         const now = CoreTime.timestamp();
         const downloadTime = packageData.downloadTime;
         let downloadTimeReadable = '';
-        if (now - downloadTime < CoreTimeConstants.SECONDS_WEEK) {
+        if (now - downloadTime < 7 * 86400) {
             downloadTimeReadable = dayjs(downloadTime * 1000).fromNow();
         } else {
             downloadTimeReadable = dayjs(downloadTime * 1000).calendar();
@@ -1401,10 +1400,9 @@ export class CoreCourseHelperProvider {
      * Get the download ID of a section. It's used to interact with CoreCourseModulePrefetchDelegate.
      *
      * @param section Section.
-     * @param section.id
      * @returns Section download ID.
      */
-    getSectionDownloadId(section: { id: number }): string {
+    getSectionDownloadId(section: {id: number}): string {
         return `Section-${section.id}`;
     }
 
@@ -1976,7 +1974,7 @@ export class CoreCourseHelperProvider {
 
     /**
      * Retrieves course summary page module.
-     * This is meant to be here so it can be overridden.
+     * This is meant to be here so it can be overriden.
      *
      * @returns Course summary page module.
      */
@@ -1988,9 +1986,8 @@ export class CoreCourseHelperProvider {
      * Open course summary in side modal.
      *
      * @param course Course selected
-     * @param options
      */
-    async openCourseSummary(course: CoreCourseWithImageAndColor & CoreCourseAnyCourseData, options: Params = {}): Promise<void> {
+    async openCourseSummary(course: CoreCourseWithImageAndColor & CoreCourseAnyCourseData): Promise<void> {
         const page = await this.getCourseSummaryPage();
 
         CoreModals.openSideModal<void>({
@@ -1998,7 +1995,6 @@ export class CoreCourseHelperProvider {
             componentProps: {
                 courseId: course.id,
                 course: course,
-                ...options,
             },
         });
     }
@@ -2123,15 +2119,12 @@ export class CoreCourseHelperProvider {
      *
      * @param sections List of sections, with subsections included in the contents.
      * @param searchValue Value to search. If moduleId, returns the section that contains the module.
-     * @param searchValue.id
-     * @param searchValue.num
-     * @param searchValue.moduleId
      * @returns Section object, list of parents (if any) from top to bottom.
      */
     findSection<T extends CoreCourseWSSection>(
         sections: T[],
-        searchValue: { id?: number; num?: number; moduleId?: number },
-    ): { section: T | undefined; parents: T[] } {
+        searchValue: { id?: number; num?: number; moduleId?: number},
+    ): {section: T | undefined; parents: T[]} {
         if (searchValue.id === undefined && searchValue.num === undefined && searchValue.moduleId === undefined) {
             return { section: undefined, parents: [] };
         }

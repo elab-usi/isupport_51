@@ -307,11 +307,9 @@ export class CoreDatabaseTable<
      * @param conditions Matching conditions. If this argument is missing, all records will be deleted.
      */
     async delete(conditions?: Partial<DBRecord>): Promise<void> {
-        if (conditions) {
-            await this.database.deleteRecords(this.tableName, conditions);
-        } else {
-            await this.database.deleteRecords(this.tableName);
-        }
+        conditions
+            ? await this.database.deleteRecords(this.tableName, conditions)
+            : await this.database.deleteRecords(this.tableName);
     }
 
     /**
@@ -436,9 +434,9 @@ export interface CoreDatabaseConfiguration {
 /**
  * Database table listener.
  */
-export type CoreDatabaseTableListener = {
+export interface CoreDatabaseTableListener {
     onDestroy?(): void;
-};
+}
 
 /**
  * CoreDatabaseTable constructor.

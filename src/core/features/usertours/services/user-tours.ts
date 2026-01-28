@@ -145,7 +145,7 @@ export class CoreUserToursService {
      *
      * @param acknowledge Whether to acknowledge that the user has seen this User Tour or not.
      */
-    async dismiss(acknowledge = true): Promise<void> {
+    async dismiss(acknowledge: boolean = true): Promise<void> {
         await this.getForegroundTour()?.dismiss(acknowledge);
 
         if (this.hasVisibleTour()) {
@@ -365,7 +365,7 @@ export const CoreUserTours = makeSingleton(CoreUserToursService);
 /**
  * User Tour controller.
  */
-export type CoreUserToursUserTour = {
+export interface CoreUserToursUserTour {
 
     /**
      * Cancelling a User Tour removes it from the queue if it was pending or dismisses it without
@@ -373,7 +373,7 @@ export type CoreUserToursUserTour = {
      */
     cancel(): Promise<void>;
 
-};
+}
 
 /**
  * User Tour side.
@@ -399,7 +399,7 @@ export const enum CoreUserToursAlignment {
 /**
  * Basic options to create a User Tour.
  */
-export type CoreUserToursBasicOptions = {
+export interface CoreUserToursBasicOptions {
 
     /**
      * Unique identifier.
@@ -446,12 +446,12 @@ export type CoreUserToursBasicOptions = {
      */
     afterTimeout?: number;
 
-};
+}
 
 /**
  * Options to create a focused User Tour.
  */
-export type CoreUserToursFocusedOptions = CoreUserToursBasicOptions & {
+export interface CoreUserToursFocusedOptions extends CoreUserToursBasicOptions {
 
     /**
      * Element to focus.
@@ -468,4 +468,4 @@ export type CoreUserToursFocusedOptions = CoreUserToursBasicOptions & {
      */
     alignment: CoreUserToursAlignment;
 
-};
+}

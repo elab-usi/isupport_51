@@ -47,7 +47,7 @@ function initializeDevelopmentWindow(window: DevelopmentWindow) {
  * Initializes the development tools if enabled by CoreConstants.
  */
 export default function(): void {
-    if (!CoreConstants.isDevOrTestingBuild()) {
+    if (!CoreConstants.enableDevTools()) {
         return;
     }
 

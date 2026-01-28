@@ -22,14 +22,14 @@ import { CoreRatingDBPrimaryData, CoreRatingDBRecord, RATINGS_TABLE } from './da
 /**
  * Structure of item sets.
  */
-export type CoreRatingItemSet = {
+export interface CoreRatingItemSet {
     component: string;
     ratingArea: string;
     contextLevel: ContextLevel;
     instanceId: number;
     itemSetId: number;
     courseId: number;
-};
+}
 
 /**
  * Service to handle offline data for rating.

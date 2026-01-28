@@ -30,16 +30,13 @@ import { CoreListItemsManager } from '@classes/items-management/list-items-manag
 import { AddonLegacyNotificationsNotificationsSource } from '@addons/notifications/classes/legacy-notifications-source';
 import { CoreLocalNotifications } from '@services/local-notifications';
 import { CoreConfig } from '@services/config';
+import { CoreConstants } from '@/core/constants';
 import { CorePlatform } from '@services/platform';
 import { CorePromiseUtils } from '@singletons/promise-utils';
 import { CoreAlerts } from '@services/overlays/alerts';
 import { CoreSharedModule } from '@/core/shared.module';
 import { CoreMainMenuUserButtonComponent } from '@features/mainmenu/components/user-menu-button/user-menu-button';
-import {
-    ADDONS_NOTIFICATIONS_READ_CHANGED_EVENT,
-    ADDONS_NOTIFICATIONS_READ_CRON_EVENT,
-} from '@addons/notifications/constants';
-import { CoreConfigSettingKey } from '@/core/constants';
+import { ADDONS_NOTIFICATIONS_READ_CHANGED_EVENT, ADDONS_NOTIFICATIONS_READ_CRON_EVENT } from '@addons/notifications/constants';
 
 /**
  * Page that displays the list of notifications.
@@ -146,7 +143,7 @@ export default class AddonNotificationsListPage implements AfterViewInit, OnDest
      * Check if the app has permission to display notifications.
      */
     protected async checkPermission(): Promise<void> {
-        this.permissionWarningHidden = !!(await CoreConfig.get(CoreConfigSettingKey.DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING, 0));
+        this.permissionWarningHidden = !!(await CoreConfig.get(CoreConstants.DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING, 0));
         this.hasNotificationsPermission = await CoreLocalNotifications.hasNotificationsPermission();
     }
 
@@ -156,11 +153,9 @@ export default class AddonNotificationsListPage implements AfterViewInit, OnDest
      * @param reload Whether to reload the list or load the next page.
      */
     protected async fetchNotifications(reload: boolean): Promise<void> {
-        if (reload) {
-            await this.notifications.reload();
-        } else {
-            await this.notifications.load();
-        }
+        reload
+            ? await this.notifications.reload()
+            : await this.notifications.load();
 
         this.fetchMoreNotificationsFailed = false;
         this.loadMarkAllAsReadButton();
@@ -254,7 +249,7 @@ export default class AddonNotificationsListPage implements AfterViewInit, OnDest
      * Hide permission warning.
      */
     hidePermissionWarning(): void {
-        CoreConfig.set(CoreConfigSettingKey.DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING, 1);
+        CoreConfig.set(CoreConstants.DONT_SHOW_NOTIFICATIONS_PERMISSION_WARNING, 1);
         this.permissionWarningHidden = true;
     }
 

@@ -31,7 +31,7 @@ import { Subscription } from 'rxjs';
 import { CoreNavigator } from '@services/navigator';
 import { CorePromiseUtils } from '@singletons/promise-utils';
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
-import { CoreConfigSettingKey, CoreSyncIcon } from '@/core/constants';
+import { CoreConstants } from '@/core/constants';
 import { CoreRoutedItemsManagerSourcesTracker } from '@classes/items-management/routed-items-manager-sources-tracker';
 import { AddonCalendarEventsSource } from '@addons/calendar/classes/events-source';
 import { CoreSwipeNavigationItemsManager } from '@classes/items-management/swipe-navigation-items-manager';
@@ -97,7 +97,7 @@ export default class AddonCalendarEventPage implements OnInit, OnDestroy {
     canEdit = false;
     hasOffline = false;
     readonly isOnline = CoreNetwork.onlineSignal;
-    syncIcon = CoreSyncIcon.LOADING; // Sync icon.
+    syncIcon = CoreConstants.ICON_LOADING; // Sync icon.
     canScheduleExactAlarms = true;
     scheduleExactWarningHidden = false;
 
@@ -174,7 +174,7 @@ export default class AddonCalendarEventPage implements OnInit, OnDestroy {
      * Check if the app can schedule exact alarms.
      */
     protected async checkExactAlarms(): Promise<void> {
-        this.scheduleExactWarningHidden = !!(await CoreConfig.get(CoreConfigSettingKey.DONT_SHOW_EXACT_ALARMS_WARNING, 0));
+        this.scheduleExactWarningHidden = !!(await CoreConfig.get(CoreConstants.DONT_SHOW_EXACT_ALARMS_WARNING, 0));
         this.canScheduleExactAlarms = await CoreLocalNotifications.canScheduleExactAlarms();
     }
 
@@ -192,7 +192,7 @@ export default class AddonCalendarEventPage implements OnInit, OnDestroy {
             return;
         }
 
-        this.syncIcon = CoreSyncIcon.LOADING;
+        this.syncIcon = CoreConstants.ICON_LOADING;
 
         await this.initializeSwipeManager();
         await this.fetchEvent();
@@ -317,7 +317,7 @@ export default class AddonCalendarEventPage implements OnInit, OnDestroy {
         }
 
         this.eventLoaded = true;
-        this.syncIcon = CoreSyncIcon.SYNC;
+        this.syncIcon = CoreConstants.ICON_SYNC;
     }
 
     /**
@@ -393,7 +393,7 @@ export default class AddonCalendarEventPage implements OnInit, OnDestroy {
         const { CoreRemindersSetReminderMenuComponent } =
             await import('@features/reminders/components/set-reminder-menu/set-reminder-menu');
 
-        const reminderTime = await CorePopovers.open<{ timeBefore: number }>({
+        const reminderTime = await CorePopovers.open<{timeBefore: number}>({
             component: CoreRemindersSetReminderMenuComponent,
             componentProps: {
                 eventTime: this.event.timestart,
@@ -466,7 +466,7 @@ export default class AddonCalendarEventPage implements OnInit, OnDestroy {
      * @returns Promise resolved when done.
      */
     async refreshEvent(sync = false, showErrors = false): Promise<void> {
-        this.syncIcon = CoreSyncIcon.LOADING;
+        this.syncIcon = CoreConstants.ICON_LOADING;
 
         const promises: Promise<void>[] = [];
 
@@ -664,7 +664,7 @@ export default class AddonCalendarEventPage implements OnInit, OnDestroy {
      * Hide alarm warning.
      */
     hideAlarmWarning(): void {
-        CoreConfig.set(CoreConfigSettingKey.DONT_SHOW_EXACT_ALARMS_WARNING, 1);
+        CoreConfig.set(CoreConstants.DONT_SHOW_EXACT_ALARMS_WARNING, 1);
         this.scheduleExactWarningHidden = true;
     }
 

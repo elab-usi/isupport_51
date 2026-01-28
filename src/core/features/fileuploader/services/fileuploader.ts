@@ -35,17 +35,16 @@ import { CorePath } from '@singletons/path';
 import { CorePlatform } from '@services/platform';
 import { CoreModals } from '@services/overlays/modals';
 import { CorePromiseUtils } from '@singletons/promise-utils';
-import { CoreBytesConstants } from '@/core/constants';
 
 /**
  * File upload options.
  */
-export type CoreFileUploaderOptions = CoreWSFileUploadOptions & {
+export interface CoreFileUploaderOptions extends CoreWSFileUploadOptions {
     /**
      * Whether the file should be deleted after the upload (if success).
      */
     deleteAfterUpload?: boolean;
-};
+}
 
 /**
  * Service to upload files.
@@ -53,8 +52,8 @@ export type CoreFileUploaderOptions = CoreWSFileUploadOptions & {
 @Injectable({ providedIn: 'root' })
 export class CoreFileUploaderProvider {
 
-    static readonly LIMITED_SIZE_WARNING = CoreBytesConstants.MEGABYTE;
-    static readonly WIFI_SIZE_WARNING = CoreBytesConstants.MEGABYTE * 10;
+    static readonly LIMITED_SIZE_WARNING = 1048576; // 1 MB.
+    static readonly WIFI_SIZE_WARNING = 10485760; // 10 MB.
 
     protected logger: CoreLogger;
 
@@ -631,7 +630,7 @@ export class CoreFileUploaderProvider {
         }
 
         // Index the online files by name.
-        const usedNames: { [name: string]: CoreFileEntry } = {};
+        const usedNames: {[name: string]: CoreFileEntry} = {};
         const filesToUpload: FileEntry[] = [];
         files.forEach((file) => {
             if (CoreFileUtils.isFileEntry(file)) {

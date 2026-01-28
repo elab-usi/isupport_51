@@ -28,7 +28,7 @@ import { CorePlatform } from '@services/platform';
 import { CoreDB } from '@services/db';
 import { CoreNavigator, CoreNavigatorService } from '@services/navigator';
 import { CoreLoadings } from '@services/overlays/loadings';
-import { TranslatePipe, TranslateService, TranslateStore } from '@ngx-translate/core';
+import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
 import { CoreIonLoadingElement } from '@classes/ion-loading';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DefaultUrlSerializer, UrlSerializer } from '@angular/router';
@@ -49,7 +49,7 @@ const DEFAULT_SERVICE_SINGLETON_MOCKS: [CoreSingletonProxy, unknown][] = [
         get: key => of(key),
         onTranslationChange: new EventEmitter(),
         onLangChange: new EventEmitter(),
-        onFallbackLangChange: new EventEmitter(),
+        onDefaultLangChange: new EventEmitter(),
     })],
     [CoreDB, mock({ getDB: () => mock() })],
     [CoreNavigator, mock({ navigateToSitePath: () => Promise.resolve(true) })],
@@ -100,7 +100,7 @@ async function renderAngularComponent<T>(component: Type<T>, config: RenderConfi
                 BrowserModule,
                 // eslint-disable-next-line @typescript-eslint/no-deprecated
                 NoopAnimationsModule,
-                TranslatePipe,
+                TranslateModule.forChild(),
                 CoreExternalContentDirectiveStub,
                 ...config.imports,
             ],
@@ -179,7 +179,9 @@ function getDefaultProviders(config: RenderConfig): unknown[] {
             useFactory: () => {
                 const store = new TranslateStore();
 
-                store.setTranslations('en', config.translations ?? {}, false);
+                store.translations = {
+                    en: config.translations ?? {},
+                };
 
                 return store;
             },
@@ -224,17 +226,17 @@ function createNewServiceInstance<Service = unknown>
     }
 }
 
-export type RenderConfig = {
+export interface RenderConfig {
     declarations: unknown[];
     providers: unknown[];
     imports: unknown[];
     translations?: Record<string, string>;
     standalone?: boolean;
-};
+}
 
-export type RenderPageConfig = RenderConfig & {
+export interface RenderPageConfig extends RenderConfig {
     routeParams: Record<string, unknown>;
-};
+}
 
 export type TestingComponentFixture<T = unknown> = Omit<ComponentFixture<T>, 'nativeElement'> & { nativeElement: Element };
 

@@ -14,20 +14,20 @@
 
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 
 @NgModule({
     imports: [
-        TranslatePipe,
+        TranslateModule.forChild(),
     ],
     exports: [
         CommonModule,
         FormsModule,
         IonicModule,
         ReactiveFormsModule,
-        TranslatePipe,
+        TranslateModule,
     ],
 })
 export class CoreBaseModule {}

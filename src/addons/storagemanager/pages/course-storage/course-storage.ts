@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DownloadStatus } from '@/core/constants';
+import { CoreConstants, DownloadStatus } from '@/core/constants';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, inject } from '@angular/core';
 import {
     CORE_COURSE_ALL_COURSES_CLEARED,
     CORE_COURSE_ALL_SECTIONS_ID,
-    CoreCourseDownloadStatusIcon,
     COURSE_STATUS_CHANGED_EVENT,
 } from '@features/course/constants';
 import { CoreCourse, sectionContentIsModule } from '@features/course/services/course';
@@ -71,7 +70,7 @@ export default class AddonStorageManagerCourseStoragePage implements OnInit, OnD
     downloadCourseEnabled = false;
 
     prefetchCourseData: CorePrefetchStatusInfo = {
-        icon: CoreCourseDownloadStatusIcon.LOADING,
+        icon: CoreConstants.ICON_LOADING,
         statusTranslatable: 'core.course.downloadcourse',
         status: DownloadStatus.DOWNLOADABLE_NOT_DOWNLOADED,
         loading: true,
@@ -214,7 +213,7 @@ export default class AddonStorageManagerCourseStoragePage implements OnInit, OnD
         // Determine the course prefetch status.
         await this.determineCoursePrefetchIcon();
 
-        if (this.prefetchCourseData.icon !== CoreCourseDownloadStatusIcon.LOADING) {
+        if (this.prefetchCourseData.icon !== CoreConstants.ICON_LOADING) {
             return;
         }
 

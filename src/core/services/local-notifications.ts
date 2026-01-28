@@ -22,7 +22,7 @@ import { CoreEventObserver, CoreEvents } from '@singletons/events';
 import { CoreText } from '@singletons/text';
 import { CoreQueueRunner } from '@classes/queue-runner';
 import { CoreError } from '@classes/errors/error';
-import { CoreConstants, CoreConfigSettingKey } from '@/core/constants';
+import { CoreConstants } from '@/core/constants';
 import { makeSingleton, NgZone, Translate, LocalNotifications, ApplicationInit } from '@singletons';
 import { CoreLogger } from '@singletons/logger';
 import {
@@ -54,8 +54,8 @@ export class CoreLocalNotificationsProvider {
 
     protected logger: CoreLogger;
     protected codes: { [s: string]: number } = {};
-    protected codeRequestsQueue: { [key: string]: CodeRequestsQueueItem } = {};
-    protected observables: { [eventName: string]: { [component: string]: Subject<unknown> } } = {};
+    protected codeRequestsQueue: {[key: string]: CodeRequestsQueueItem} = {};
+    protected observables: {[eventName: string]: {[component: string]: Subject<unknown>}} = {};
 
     protected triggerSubscription?: Subscription;
     protected clickSubscription?: Subscription;
@@ -155,7 +155,7 @@ export class CoreLocalNotificationsProvider {
                 return;
             }
 
-            const dontShowWarning = await CoreConfig.get(CoreConfigSettingKey.EXACT_ALARMS_WARNING_DISPLAYED, 0);
+            const dontShowWarning = await CoreConfig.get(CoreConstants.EXACT_ALARMS_WARNING_DISPLAYED, 0);
             if (dontShowWarning) {
                 return;
             }
@@ -177,7 +177,7 @@ export class CoreLocalNotificationsProvider {
                 ],
             });
 
-            CoreConfig.set(CoreConfigSettingKey.EXACT_ALARMS_WARNING_DISPLAYED, 1);
+            CoreConfig.set(CoreConstants.EXACT_ALARMS_WARNING_DISPLAYED, 1);
         });
     }
 
@@ -339,11 +339,7 @@ export class CoreLocalNotificationsProvider {
             // LocalNotifications.getAllScheduled is broken, use the Cordova plugin directly.
             const plugin = this.getCordovaPlugin();
 
-            if (plugin) {
-                plugin.getScheduled(notifications => resolve(notifications));
-            } else {
-                resolve([]);
-            }
+            plugin ? plugin.getScheduled(notifications => resolve(notifications)) : resolve([]);
         }));
     }
 
@@ -480,7 +476,7 @@ export class CoreLocalNotificationsProvider {
      * @param useQueue Whether to add the call to the queue.
      * @returns Promise resolved with a boolean indicating if promise is triggered (true) or not.
      */
-    async isTriggered(notification: ILocalNotification, useQueue = true): Promise<boolean> {
+    async isTriggered(notification: ILocalNotification, useQueue: boolean = true): Promise<boolean> {
         if (notification.id === undefined) {
             return false;
         }
@@ -783,7 +779,7 @@ export class CoreLocalNotificationsProvider {
                 if (!this.canDisableSound()) {
                     soundEnabled = true;
                 } else {
-                    soundEnabled = await CoreConfig.get(CoreConfigSettingKey.NOTIFICATION_SOUND, true);
+                    soundEnabled = await CoreConfig.get(CoreConstants.SETTINGS_NOTIFICATION_SOUND, true);
                 }
 
                 if (!soundEnabled) {

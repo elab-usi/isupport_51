@@ -44,4 +44,9 @@ export class CoreEmptyBoxComponent {
     readonly icon = input(); // Name of the icon to use.
     readonly image = input(); // Image source. If an icon is provided, image won't be used.
 
+    /**
+     * @deprecated since 4.4. Not used anymore.
+     */
+    readonly flipIconRtl = input(false, { transform: toBoolean });
+
 }

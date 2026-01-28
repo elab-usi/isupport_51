@@ -29,7 +29,7 @@ import { CoreTime } from '@singletons/time';
 import { CoreUrl, CoreUrlPartNames } from '@singletons/url';
 import { CoreArray } from '@singletons/array';
 import { CoreError } from '@classes/errors/error';
-import { CoreBytesConstants, DownloadStatus } from '@/core/constants';
+import { DownloadStatus } from '@/core/constants';
 import { ApplicationInit, makeSingleton, NgZone, Translate } from '@singletons';
 import { CoreLogger } from '@singletons/logger';
 import {
@@ -241,7 +241,7 @@ class CoreFilepoolQueue {
     getPromise(
         siteId: string,
         fileId: string,
-        create = true,
+        create: boolean = true,
         onProgress?: CoreFilepoolOnProgressCallback,
     ): CoreFilepoolPromisedValue | undefined {
         if (!this.deferreds[siteId]) {
@@ -399,8 +399,8 @@ export class CoreFilepoolProvider {
 
     // Constants.
     protected static readonly FOLDER = 'filepool';
-    protected static readonly WIFI_DOWNLOAD_THRESHOLD = 20 * CoreBytesConstants.MEGABYTE;
-    protected static readonly DOWNLOAD_THRESHOLD = 2 * CoreBytesConstants.MEGABYTE;
+    protected static readonly WIFI_DOWNLOAD_THRESHOLD = 20971520; // 20MB.
+    protected static readonly DOWNLOAD_THRESHOLD = 2097152; // 2MB.
 
     protected static readonly FILE_IS_UNKNOWN_SQL =
         'isexternalfile = 1 OR ((revision IS NULL OR revision = 0) AND (timemodified IS NULL OR timemodified = 0))';
@@ -421,7 +421,7 @@ export class CoreFilepoolProvider {
     protected queue: CoreFilepoolQueue; // To handle file downloads using the queue.
 
     // To handle file downloads using the queue.
-    protected sizeCache: { [fileUrl: string]: number } = {}; // A "cache" to store file sizes.
+    protected sizeCache: {[fileUrl: string]: number} = {}; // A "cache" to store file sizes.
     // Variables to prevent downloading packages/files twice at the same time.
     protected packagesPromises: { [s: string]: { [s: string]: Promise<void> } } = {};
     protected filePromises: { [s: string]: { [s: string]: Promise<string> } } = {};
@@ -792,7 +792,7 @@ export class CoreFilepoolProvider {
         component?: string,
         componentId?: string | number,
         timemodified = 0,
-        checkSize = true,
+        checkSize: boolean = true,
         downloadUnknown?: boolean,
         options: CoreFilepoolFileOptions = {},
         revision?: number,
@@ -2477,18 +2477,16 @@ export class CoreFilepoolProvider {
      *                    It is advised to set it to true to reduce the performance and data usage of the app.
      * @returns Resolved on success.
      */
-    async invalidateAllFiles(siteId: string, onlyUnknown = true): Promise<void> {
-        if (onlyUnknown) {
-            await this.filesTables[siteId].updateWhere(
+    async invalidateAllFiles(siteId: string, onlyUnknown: boolean = true): Promise<void> {
+        onlyUnknown
+            ? await this.filesTables[siteId].updateWhere(
                 { stale: 1 },
                 {
                     sql: CoreFilepoolProvider.FILE_IS_UNKNOWN_SQL,
                     js: CoreFilepoolProvider.FILE_IS_UNKNOWN_JS,
                 },
-            );
-        } else {
-            await this.filesTables[siteId].update({ stale: 1 });
-        }
+            )
+            : await this.filesTables[siteId].update({ stale: 1 });
     }
 
     /**
@@ -2524,7 +2522,7 @@ export class CoreFilepoolProvider {
         siteId: string | undefined,
         component: string,
         componentId?: string | number,
-        onlyUnknown = true,
+        onlyUnknown: boolean = true,
     ): Promise<void> {
         siteId = siteId ?? CoreSites.getCurrentSiteId();
 

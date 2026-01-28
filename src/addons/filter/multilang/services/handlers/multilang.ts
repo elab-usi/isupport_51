@@ -58,18 +58,17 @@ export class AddonFilterMultilangHandlerService extends CoreFilterDefaultHandler
         }
 
         // Find language to use.
-        let language = [
+        const language = [
             await CoreLang.getCurrentLanguage(),
             CoreLang.getParentLanguage(),
             CoreLang.getFallbackLanguage(),
             firstLanguage,
-        ].find(candidate => candidate && languages.has(candidate));
+        ]
+            .find(candidate => candidate && languages.has(candidate));
 
         if (!language) {
             return text;
         }
-
-        language = CoreLang.getLanguageAppVariant(language);
 
         // Apply filter.
         const anyLangRegEx = /<(lang|span)[^>]+lang="[a-zA-Z0-9_-]+"[^>]*>.*?<\/(lang|span)>/img;

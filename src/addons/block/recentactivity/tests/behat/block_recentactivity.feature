@@ -1,4 +1,4 @@
-@app_parallel_run_blocks @addon_block_recent_activity @app @block @block_recent_activity @javascript
+@addon_block_recent_activity @app @block @block_recent_activity @javascript
 Feature: Basic tests of recent activity block
 
   Background:
@@ -34,7 +34,6 @@ Feature: Basic tests of recent activity block
     And I should find "Not important" in the app
     And I should not find "Discussion One" in the app
 
-  @disabled_features
   Scenario: Block is included in disabled features
     # Add another block just to ensure there is something in the block region and the drawer is displayed.
     Given the following "blocks" exist:

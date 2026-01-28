@@ -139,9 +139,9 @@ export class CoreUtilsProvider {
     basicLeftCompare(
         itemA: any, // eslint-disable-line @typescript-eslint/no-explicit-any
         itemB: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-        maxLevels = 0,
-        level = 0,
-        undefinedIsNull = true,
+        maxLevels: number = 0,
+        level: number = 0,
+        undefinedIsNull: boolean = true,
     ): boolean {
         return CoreObject.basicLeftCompare(itemA, itemB, maxLevels, level, undefinedIsNull);
     }
@@ -194,8 +194,26 @@ export class CoreUtilsProvider {
      * @returns Cloned variable.
      * @deprecated since 5.0. Use CoreUtils.clone instead.
      */
-    clone<T>(source: T, level = 0): T {
+    clone<T>(source: T, level: number = 0): T {
         return CoreUtilsSingleton.clone(source, level);
+    }
+
+    /**
+     * Copy properties from one object to another.
+     *
+     * @param from Object to copy the properties from.
+     * @param to Object where to store the properties.
+     * @param clone Whether the properties should be cloned (so they are different instances).
+     * @deprecated since 4.4. Not used anymore.
+     */
+    copyProperties(from: Record<string, unknown>, to: Record<string, unknown>, clone: boolean = true): void {
+        for (const name in from) {
+            if (clone) {
+                to[name] = CoreUtilsSingleton.clone(from[name]);
+            } else {
+                to[name] = from[name];
+            }
+        }
     }
 
     /**
@@ -208,6 +226,30 @@ export class CoreUtilsProvider {
      */
     async copyToClipboard(text: string): Promise<void> {
         return CoreText.copyToClipboard(text);
+    }
+
+    /**
+     * Empties an array without losing its reference.
+     *
+     * @param array Array to empty.
+     * @deprecated since 4.4. Not used anymore.
+     */
+    emptyArray(array: unknown[]): void {
+        array.length = 0; // Empty array without losing its reference.
+    }
+
+    /**
+     * Removes all properties from an object without losing its reference.
+     *
+     * @param object Object to remove the properties.
+     * @deprecated since 4.4. Not used anymore.
+     */
+    emptyObject(object: Record<string, unknown>): void {
+        for (const key in object) {
+            if (Object.prototype.hasOwnProperty.call(object, key)) {
+                delete object[key];
+            }
+        }
     }
 
     /**
@@ -232,6 +274,18 @@ export class CoreUtilsProvider {
      */
     flattenObject(obj: Record<string, unknown>, useDotNotation?: boolean): Record<string, unknown> {
         return CoreObject.flatten(obj, useDotNotation);
+    }
+
+    /**
+     * Given an array of strings, return only the ones that match a regular expression.
+     *
+     * @param array Array to filter.
+     * @param regex RegExp to apply to each string.
+     * @returns Filtered array.
+     * @deprecated since 4.4. Use CoreArray.filterByRegexp instead.
+     */
+    filterByRegexp(array: string[], regex: RegExp): string[] {
+        return CoreArray.filterByRegexp(array, regex);
     }
 
     /**
@@ -281,10 +335,10 @@ export class CoreUtilsProvider {
      */
     formatTree<T>(
         list: T[],
-        parentFieldName = 'parent',
-        idFieldName = 'id',
-        rootParentId = 0,
-        maxDepth = 5,
+        parentFieldName: string = 'parent',
+        idFieldName: string = 'id',
+        rootParentId: number = 0,
+        maxDepth: number = 5,
     ): TreeNode<T>[] {
         return CoreUtilsSingleton.formatTree(list, parentFieldName, idFieldName, rootParentId, maxDepth);
     }
@@ -389,6 +443,18 @@ export class CoreUtilsProvider {
     }
 
     /**
+     * Gets the index of the first string that matches a regular expression.
+     *
+     * @param array Array to search.
+     * @param regex RegExp to apply to each string.
+     * @returns Index of the first string that matches the RegExp. -1 if not found.
+     * @deprecated since 4.4. Use CoreArray.indexOfRegexp instead.
+     */
+    indexOfRegexp(array: string[], regex: RegExp): number {
+        return CoreArray.indexOfRegexp(array, regex);
+    }
+
+    /**
      * Return true if the param is false (bool), 0 (number) or "0" (string).
      *
      * @param value Value to check.
@@ -450,7 +516,7 @@ export class CoreUtilsProvider {
     makeMenuFromList<T>(
         list: string,
         defaultLabel?: string,
-        separator = ',',
+        separator: string = ',',
         defaultValue?: T,
     ): CoreMenuItem<T>[] {
         return CoreUtilsSingleton.makeMenuFromList(list, defaultLabel, separator, defaultValue);
@@ -554,7 +620,7 @@ export class CoreUtilsProvider {
      */
     objectToArrayOfObjects<
         A extends Record<string,unknown> = Record<string, unknown>,
-        O extends Record<string, unknown> = Record<string, unknown>,
+        O extends Record<string, unknown> = Record<string, unknown>
     >(
         obj: O,
         keyName: string,
@@ -581,7 +647,7 @@ export class CoreUtilsProvider {
         keyName: string,
         valueName: string,
         keyPrefix?: string,
-    ): { [name: string]: T } {
+    ): {[name: string]: T} {
         return CoreObject.toKeyValueMap(objects, keyName, valueName, keyPrefix);
     }
 
@@ -593,7 +659,7 @@ export class CoreUtilsProvider {
      * @returns GET params.
      * @deprecated since 5.0. Use CoreObject.toGetParams instead.
      */
-    objectToGetParams(object: Record<string, unknown>, removeEmpty = true): string {
+    objectToGetParams(object: Record<string, unknown>, removeEmpty: boolean = true): string {
         return CoreObject.toGetParams(object, removeEmpty);
     }
 
@@ -721,6 +787,18 @@ export class CoreUtilsProvider {
      */
     unformatFloat(localeFloat: string | number | null | undefined, strict?: boolean): false | '' | number {
         return CoreUtilsSingleton.unformatFloat(localeFloat, strict);
+    }
+
+    /**
+     * Return an array without duplicate values.
+     *
+     * @param array The array to treat.
+     * @param [key] Key of the property that must be unique. If not specified, the whole entry.
+     * @returns Array without duplicate values.
+     * @deprecated since 4.4. Use CoreArray.unique instead.
+     */
+    uniqueArray<T>(array: T[], key?: string): T[] {
+        return CoreArray.unique(array, key);
     }
 
     /**

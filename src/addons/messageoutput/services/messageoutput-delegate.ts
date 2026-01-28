@@ -39,7 +39,7 @@ export interface AddonMessageOutputHandler extends CoreDelegateHandler {
 /**
  * Data needed to render a message output handler. It's returned by the handler.
  */
-export type AddonMessageOutputHandlerData = {
+export interface AddonMessageOutputHandlerData {
     /**
      * Handler's priority.
      */
@@ -64,7 +64,7 @@ export type AddonMessageOutputHandlerData = {
      * Params to pass to the page.
      */
     pageParams?: Params;
-};
+}
 
 /**
  * Delegate to register processors (message/output) to be used in places like notification preferences.

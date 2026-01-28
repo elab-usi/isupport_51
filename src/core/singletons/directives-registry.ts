@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Directive } from '@angular/core';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { CoreWait } from './wait';
 import { CoreLogger } from './logger';
 

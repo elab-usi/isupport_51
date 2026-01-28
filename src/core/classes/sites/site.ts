@@ -27,7 +27,7 @@ import {
 import { CoreTime } from '@singletons/time';
 import { CoreUrl } from '@singletons/url';
 import { CoreOpener, CoreOpenerOpenInBrowserOptions } from '@singletons/opener';
-import { CoreConstants, CoreTimeConstants } from '@/core/constants';
+import { CoreConstants } from '@/core/constants';
 import { SQLiteDB } from '@classes/sqlitedb';
 import { CoreError } from '@classes/errors/error';
 import { CoreLogger } from '@singletons/logger';
@@ -670,7 +670,7 @@ export class CoreSite extends CoreAuthenticatedSite {
      * @param showModal Whether to show a loading modal.
      * @returns Promise resolved with the converted URL.
      */
-    async getAutoLoginUrl(url: string, showModal = true): Promise<string> {
+    async getAutoLoginUrl(url: string, showModal: boolean = true): Promise<string> {
         if (!this.privateToken) {
             // No private token, don't change the URL.
             return url;
@@ -884,7 +884,7 @@ export class CoreSite extends CoreAuthenticatedSite {
     async getAutoLoginMinTimeBetweenRequests(): Promise<number> {
         const timeBetweenRequests = await CorePromiseUtils.ignoreErrors(
             this.getConfig('tool_mobile_autologinmintimebetweenreq'),
-            CoreTimeConstants.SECONDS_MINUTE * 6,
+            CoreConstants.SECONDS_MINUTE * 6,
         );
 
         return Number(timeBetweenRequests);

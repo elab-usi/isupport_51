@@ -43,7 +43,7 @@ import { CoreSubscriptions } from '@singletons/subscriptions';
 import { CoreDirectivesRegistry } from '@singletons/directives-registry';
 import { CoreCollapsibleItemDirective } from './collapsible-item';
 import { CoreCancellablePromise } from '@classes/cancellable-promise';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { CoreDom } from '@singletons/dom';
 import { CoreEvents } from '@singletons/events';
 import { CoreRefreshContext, CORE_REFRESH_CONTEXT } from '@/core/utils/refresh-context';
@@ -53,7 +53,7 @@ import { MediaElementController } from '@classes/element-controllers/MediaElemen
 import { FrameElement, FrameElementController } from '@classes/element-controllers/FrameElementController';
 import { CoreUrl } from '@singletons/url';
 import { CoreIcons } from '@singletons/icons';
-import { ContextLevel, CoreLinkOpenMethod } from '../constants';
+import { ContextLevel } from '../constants';
 import { CoreWait } from '@singletons/wait';
 import { toBoolean } from '../transforms/boolean';
 import { CoreViewer } from '@features/viewer/services/viewer';
@@ -839,7 +839,7 @@ export class CoreFormatTextDirective implements OnDestroy, AsyncDirective {
                 // Try to convert the URL to absolute if needed.
                 url = CoreUrl.toAbsoluteURL(site.getURL(), url);
                 const confirmMessage = element.dataset.appUrlConfirm;
-                const openInApp = element.dataset.openIn === CoreLinkOpenMethod.APP;
+                const openInApp = element.dataset.openIn === 'app';
                 const refreshOnResume = element.dataset.appUrlResumeAction === 'refresh';
 
                 if (confirmMessage) {
@@ -925,7 +925,7 @@ export class CoreFormatTextDirective implements OnDestroy, AsyncDirective {
      * @param element Video or audio to treat.
      * @param isVideo Whether it's a video.
      */
-    protected treatMedia(element: HTMLElement, isVideo = false): void {
+    protected treatMedia(element: HTMLElement, isVideo: boolean = false): void {
         if (isVideo) {
             this.fixVideoSrcPlaceholder(element);
         }

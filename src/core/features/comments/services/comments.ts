@@ -85,7 +85,7 @@ export class CoreCommentsProvider {
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId?: string,
     ): Promise<CoreCommentsData | false> {
         siteId = siteId || CoreSites.getCurrentSiteId();
@@ -133,7 +133,7 @@ export class CoreCommentsProvider {
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId?: string,
     ): Promise<CoreCommentsData> {
         const comments: CoreCommentsCommentBasicData[] = [
@@ -179,6 +179,28 @@ export class CoreCommentsProvider {
         };
 
         return site.write('core_comment_add_comments', data);
+    }
+
+    /**
+     * Check if comments are disabled in a certain site.
+     *
+     * @param site Site. If not defined, use current site.
+     * @returns Whether it's disabled.
+     * @deprecated since 4.4. Use areCommentsEnabledInSite instead.
+     */
+    areCommentsDisabledInSite(site?: CoreSite): boolean {
+        return !this.areCommentsEnabledInSite(site);
+    }
+
+    /**
+     * Check if comments are disabled in a certain site.
+     *
+     * @param siteId Site Id. If not defined, use current site.
+     * @returns Promise resolved with true if disabled, rejected or resolved with false otherwise.
+     * @deprecated since 4.4. Use areCommentsEnabled instead.
+     */
+    async areCommentsDisabled(siteId?: string): Promise<boolean> {
+        return !this.areCommentsEnabled(siteId);
     }
 
     /**
@@ -301,7 +323,7 @@ export class CoreCommentsProvider {
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId?: string,
     ): Promise<void> {
         const site = await CoreSites.getSite(siteId);
@@ -350,7 +372,7 @@ export class CoreCommentsProvider {
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
     ): string {
         return `${this.getCommentsPrefixCacheKey(contextLevel, instanceId)}:${component}:${itemId}:${area}`;
     }
@@ -383,8 +405,8 @@ export class CoreCommentsProvider {
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
-        page = 0,
+        area: string = '',
+        page: number = 0,
         siteId?: string,
     ): Promise<CoreCommentsGetCommentsWSResponse> {
         const site = await CoreSites.getSite(siteId);
@@ -432,7 +454,7 @@ export class CoreCommentsProvider {
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId?: string,
     ): Promise<string> {
 
@@ -496,7 +518,7 @@ export class CoreCommentsProvider {
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId?: string,
     ): Promise<void> {
         const site = await CoreSites.getSite(siteId);

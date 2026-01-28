@@ -20,10 +20,10 @@ import { CoreApp, CoreStoreConfig } from '@services/app';
 import { CoreConfig } from '@services/config';
 import { CoreEvents, CoreEventSessionExpiredData, CoreEventSiteData } from '@singletons/events';
 import { CoreSites, CoreLoginSiteInfo, CoreSiteBasicInfo } from '@services/sites';
-import { CoreWSExternalWarning } from '@services/ws';
-import { CoreText } from '@singletons/text';
+import { CoreWS, CoreWSExternalWarning } from '@services/ws';
+import { CoreText, CoreTextFormat } from '@singletons/text';
 import { CoreObject } from '@singletons/object';
-import { CoreConstants, CoreTimeConstants } from '@/core/constants';
+import { CoreConstants } from '@/core/constants';
 import { CoreSite } from '@classes/sites/site';
 import { CoreError, CoreErrorDebug } from '@classes/errors/error';
 import { CoreWSError } from '@classes/errors/wserror';
@@ -48,12 +48,12 @@ import {
     ALWAYS_SHOW_LOGIN_FORM,
     ALWAYS_SHOW_LOGIN_FORM_CHANGED,
     APP_UNSUPPORTED_CHURN,
+    EMAIL_SIGNUP_FEATURE_NAME,
     FAQ_QRCODE_IMAGE_HTML,
     FAQ_QRCODE_INFO_DONE,
+    FORGOTTEN_PASSWORD_FEATURE_NAME,
     IDENTITY_PROVIDERS_FEATURE_NAME,
     IDENTITY_PROVIDER_FEATURE_NAME_PREFIX,
-    LOGIN_SSO_LAUNCH_DATA,
-    NO_SITE_ID,
 } from '../constants';
 import { LazyDefaultStandaloneComponent } from '@/app/app-routing.module';
 import { CoreSiteError } from '@classes/errors/siteerror';
@@ -65,13 +65,6 @@ import { CorePromiseUtils } from '@singletons/promise-utils';
 import { CoreOpener } from '@singletons/opener';
 import { CoreAlerts } from '@services/overlays/alerts';
 import { CorePrompts } from '@services/overlays/prompts';
-import {
-    AuthEmailSignupProfileField,
-    AuthEmailSignupProfileFieldsCategory,
-    AuthEmailSignupSettings,
-    CoreLoginSignUp,
-} from './signup';
-import { CoreSitesFactory } from '@services/sites-factory';
 
 /**
  * Helper provider that provides some common features regarding authentication.
@@ -104,6 +97,19 @@ export class CoreLoginHelperProvider {
      */
     async initialize(): Promise<void> {
         this.cleanUpPasswordResets();
+    }
+
+    /**
+     * Accept site policy.
+     *
+     * @param siteId Site ID. If not defined, current site.
+     * @returns Promise resolved if success, rejected if failure.
+     * @deprecated since 4.4. Use CorePolicy.acceptMandatoryPolicies instead.
+     */
+    async acceptSitePolicy(siteId?: string): Promise<void> {
+        const { CorePolicy } = await import('@features/policy/services/policy');
+
+        return CorePolicy.acceptMandatorySitePolicies(siteId);
     }
 
     /**
@@ -180,10 +186,59 @@ export class CoreLoginHelperProvider {
      *
      * @param profileFields Profile fields to format.
      * @returns Categories with the fields to show in each one.
-     * @deprecated since 5.2. Please use CoreLoginSignUp.formatProfileFieldsForSignup instead.
      */
     formatProfileFieldsForSignup(profileFields?: AuthEmailSignupProfileField[]): AuthEmailSignupProfileFieldsCategory[] {
-        return CoreLoginSignUp.formatProfileFieldsForSignup(profileFields);
+        if (!profileFields) {
+            return [];
+        }
+
+        const categories: Record<number, AuthEmailSignupProfileFieldsCategory> = {};
+
+        profileFields.forEach((field) => {
+            if (!field.signup || !field.categoryid) {
+                // Not a signup field, ignore it.
+                return;
+            }
+
+            if (!categories[field.categoryid]) {
+                categories[field.categoryid] = {
+                    id: field.categoryid,
+                    name: field.categoryname || '',
+                    fields: [],
+                };
+            }
+
+            categories[field.categoryid].fields.push(field);
+        });
+
+        return Object.keys(categories).map((index) => categories[Number(index)]);
+    }
+
+    /**
+     * Get disabled features from a site public config.
+     *
+     * @param config Site public config.
+     * @returns Disabled features.
+     * @deprecated since 4.4. Shoudn't be used since disabled features are not treated by this function anymore.
+     */
+    getDisabledFeatures(config?: CoreSitePublicConfigResponse): string {
+        const disabledFeatures = config?.tool_mobile_disabledfeatures;
+        if (!disabledFeatures) {
+            return '';
+        }
+
+        return disabledFeatures;
+    }
+
+    /**
+     * Get logo URL from a site public config.
+     *
+     * @param config Site public config.
+     * @returns Logo URL.
+     * @deprecated since 4.4. Please use getLogoUrl in a site instance.
+     */
+    getLogoUrl(config: CoreSitePublicConfigResponse): string | undefined {
+        return !CoreConstants.CONFIG.forceLoginLogo && config ? (config.logourl || config.compactlogourl) : undefined;
     }
 
     /**
@@ -214,10 +269,22 @@ export class CoreLoginHelperProvider {
      *
      * @param siteUrl Site URL.
      * @returns Signup settings.
-     * @deprecated since 5.2. Please use CoreLoginSignUp.getEmailSignupSettings instead.
      */
     async getEmailSignupSettings(siteUrl: string): Promise<AuthEmailSignupSettings> {
-        return CoreLoginSignUp.getEmailSignupSettings(CoreSitesFactory.makeUnauthenticatedSite(siteUrl));
+        return await CoreWS.callAjax('auth_email_get_signup_settings', {}, { siteUrl });
+    }
+
+    /**
+     * Get the site policy.
+     *
+     * @param siteId Site ID. If not defined, current site.
+     * @returns Promise resolved with the site policy.
+     * @deprecated since 4.4. Use CorePolicy.getSitePoliciesURL instead.
+     */
+    async getSitePolicy(siteId?: string): Promise<string> {
+        const { CorePolicy } = await import('@features/policy/services/policy');
+
+        return CorePolicy.getSitePoliciesURL(siteId);
     }
 
     /**
@@ -238,6 +305,47 @@ export class CoreLoginHelperProvider {
      */
     getDemoModeSiteInfo(): CoreLoginSiteInfo | undefined {
         return CoreConstants.CONFIG.sites.find(site => site.demoMode);
+    }
+
+    /**
+     * Get the valid identity providers from a site config.
+     *
+     * @param siteConfig Site's public config.
+     * @returns Valid identity providers.
+     * @deprecated since 4.4. Please use getValidIdentityProvidersForSite instead.
+     */
+    getValidIdentityProviders(siteConfig?: CoreSitePublicConfigResponse): CoreSiteIdentityProvider[] {
+        if (!siteConfig) {
+            return [];
+        }
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        if (this.isFeatureDisabled(IDENTITY_PROVIDERS_FEATURE_NAME, siteConfig)) {
+            // Identity providers are disabled, return an empty list.
+            return [];
+        }
+
+        const validProviders: CoreSiteIdentityProvider[] = [];
+        const httpUrl = CorePath.concatenatePaths(siteConfig.wwwroot, 'auth/oauth2/');
+        const httpsUrl = CorePath.concatenatePaths(siteConfig.httpswwwroot, 'auth/oauth2/');
+
+        if (siteConfig.identityproviders && siteConfig.identityproviders.length) {
+            siteConfig.identityproviders.forEach((provider) => {
+                const urlParams = CoreUrl.extractUrlParams(provider.url);
+
+                if (
+                    provider.url &&
+                    (provider.url.indexOf(httpsUrl) != -1 || provider.url.indexOf(httpUrl) != -1) &&
+                    !this.isFeatureDisabled( // eslint-disable-line @typescript-eslint/no-deprecated
+                        IDENTITY_PROVIDER_FEATURE_NAME_PREFIX + urlParams.id,
+                        siteConfig,
+                    )
+                ) {
+                    validProviders.push(provider);
+                }
+            });
+        }
+
+        return validProviders;
     }
 
     /**
@@ -301,7 +409,7 @@ export class CoreLoginHelperProvider {
         if (CoreSites.isLoggedIn()) {
             // Logout first.
             await CoreSites.logout({
-                siteId: NO_SITE_ID,
+                siteId: CoreConstants.NO_SITE_ID,
                 redirectPath: '/login/sites',
                 redirectOptions: { params: { openAddSite: true , showKeyboard } },
             });
@@ -356,6 +464,35 @@ export class CoreLoginHelperProvider {
     }
 
     /**
+     * Given a site public config, check if email signup is disabled.
+     *
+     * @param config Site public config.
+     * @returns Whether email signup is disabled.
+     * @deprecated since 4.4. Please use isFeatureDisabled in a site instance.
+     */
+    isEmailSignupDisabled(config?: CoreSitePublicConfigResponse): boolean {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        return this.isFeatureDisabled(EMAIL_SIGNUP_FEATURE_NAME, config);
+    }
+
+    /**
+     * Given a site public config, check if a certian feature is disabled.
+     *
+     * @param feature Feature to check.
+     * @param config Site public config.
+     * @returns Whether email signup is disabled.
+     * @deprecated since 4.4. Please use isFeatureDisabled in a site instance.
+     */
+    isFeatureDisabled(feature: string, config?: CoreSitePublicConfigResponse): boolean {
+       // eslint-disable-next-line @typescript-eslint/no-deprecated
+       const disabledFeatures = this.getDisabledFeatures(config);
+
+        const regEx = new RegExp(`(,|^)${feature}(,|$)`, 'g');
+
+        return !!disabledFeatures.match(regEx);
+    }
+
+    /**
      * Check if the app is configured to use a fixed URL (only 1).
      *
      * @returns Whether there is 1 fixed URL.
@@ -364,6 +501,18 @@ export class CoreLoginHelperProvider {
         const sites = await this.getAvailableSites();
 
         return sites.length === 1;
+    }
+
+    /**
+     * Given a site public config, check if forgotten password is disabled.
+     *
+     * @param config Site public config.
+     * @returns Whether it's disabled.
+     * @deprecated since 4.4. Please use isFeatureDisabled in a site instance.
+     */
+    isForgottenPasswordDisabled(config?: CoreSitePublicConfigResponse): boolean {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        return this.isFeatureDisabled(FORGOTTEN_PASSWORD_FEATURE_NAME, config);
     }
 
     /**
@@ -652,7 +801,7 @@ export class CoreLoginHelperProvider {
 
         // Store the siteurl and passport in CoreConfig for persistence.
         // We are "configuring" the app to wait for an SSO. CoreConfig shouldn't be used as a temporary storage.
-        await CoreConfig.set(LOGIN_SSO_LAUNCH_DATA, JSON.stringify(<StoredLoginLaunchData> {
+        await CoreConfig.set(CoreConstants.LOGIN_LAUNCH_DATA, JSON.stringify(<StoredLoginLaunchData> {
             siteUrl,
             passport,
             ...redirectData,
@@ -681,7 +830,7 @@ export class CoreLoginHelperProvider {
             params.email = email.trim().toLowerCase();
         }
 
-        return CoreSitesFactory.makeUnauthenticatedSite(siteUrl).callAjax('core_auth_request_password_reset', params);
+        return CoreWS.callAjax('core_auth_request_password_reset', params, { siteUrl });
     }
 
     /**
@@ -889,11 +1038,13 @@ export class CoreLoginHelperProvider {
             // Call the WS to resend the confirmation email.
             const modal = await CoreLoadings.show('core.sending', true);
             const data = { username: username?.toLowerCase(), password };
+            const preSets = { siteUrl };
 
             try {
-                const result = <ResendConfirmationEmailResult> await CoreSitesFactory.makeUnauthenticatedSite(siteUrl).callAjax(
+                const result = <ResendConfirmationEmailResult> await CoreWS.callAjax(
                     'core_auth_resend_confirmation_email',
                     data,
+                    preSets,
                 );
 
                 if (!result.status) {
@@ -926,7 +1077,7 @@ export class CoreLoginHelperProvider {
         // We don't have site info before login, the only way to check if the WS is available is by calling it.
         try {
             // This call will always fail because we aren't sending parameters.
-            await CoreSitesFactory.makeUnauthenticatedSite(siteUrl).callAjax('core_auth_resend_confirmation_email');
+            await CoreWS.callAjax('core_auth_resend_confirmation_email', {}, { siteUrl });
 
             return true; // We should never reach here.
         } catch (error) {
@@ -935,6 +1086,19 @@ export class CoreLoginHelperProvider {
         } finally {
             modal.dismiss();
         }
+    }
+
+    /**
+     * Function called when site policy is not agreed. Reserved for core use.
+     *
+     * @param siteId Site ID. If not defined, current site.
+     * @returns void
+     * @deprecated since 4.4. Use CorePolicy.goToAcceptSitePolicies instead.
+     */
+    async sitePolicyNotAgreed(siteId?: string): Promise<void> {
+        const { CorePolicy } = await import('@features/policy/services/policy');
+
+        return CorePolicy.goToAcceptSitePolicies(siteId);
     }
 
     /**
@@ -980,7 +1144,7 @@ export class CoreLoginHelperProvider {
         // Split signature:::token
         const params = url.split(':::');
 
-        const serializedData = await CoreConfig.get<string>(LOGIN_SSO_LAUNCH_DATA);
+        const serializedData = await CoreConfig.get<string>(CoreConstants.LOGIN_LAUNCH_DATA);
 
         const data = <StoredLoginLaunchData | null> CoreText.parseJSON(serializedData, null);
         if (data === null) {
@@ -991,7 +1155,7 @@ export class CoreLoginHelperProvider {
         let launchSiteURL = data.siteUrl;
 
         // Reset temporary values.
-        CoreConfig.delete(LOGIN_SSO_LAUNCH_DATA);
+        CoreConfig.delete(CoreConstants.LOGIN_LAUNCH_DATA);
 
         // Validate the signature.
         // We need to check both http and https.
@@ -1284,7 +1448,7 @@ export class CoreLoginHelperProvider {
         const passwordResets = await this.getPasswordResets();
 
         return siteUrl in passwordResets
-            && passwordResets[siteUrl] > Date.now() - CoreTimeConstants.MILLISECONDS_HOUR;
+            && passwordResets[siteUrl] > Date.now() - CoreConstants.MILLISECONDS_HOUR;
     }
 
     /**
@@ -1295,7 +1459,7 @@ export class CoreLoginHelperProvider {
         const siteUrls = Object.keys(passwordResets);
 
         for (const siteUrl of siteUrls) {
-            if (passwordResets[siteUrl] > Date.now() - CoreTimeConstants.MILLISECONDS_HOUR) {
+            if (passwordResets[siteUrl] > Date.now() - CoreConstants.MILLISECONDS_HOUR) {
                 continue;
             }
 
@@ -1355,6 +1519,7 @@ export class CoreLoginHelperProvider {
     }
 
 }
+
 export const CoreLoginHelper = makeSingleton(CoreLoginHelperProvider);
 
 /**
@@ -1375,6 +1540,61 @@ export type CoreLoginSSOData = CoreRedirectPayload & {
     token?: string; // User's token.
     privateToken?: string; // User's private token.
     ssoUrlParams?: CoreUrlParams; // Other params added to the login url.
+};
+
+/**
+ * Result of WS auth_email_get_signup_settings.
+ */
+export type AuthEmailSignupSettings = {
+    namefields: string[];
+    passwordpolicy?: string; // Password policy.
+    sitepolicy?: string; // Site policy.
+    sitepolicyhandler?: string; // Site policy handler.
+    defaultcity?: string; // Default city.
+    country?: string; // Default country.
+    extendedusernamechars?: boolean; // @since 4.4. Extended characters in usernames or no.
+    profilefields?: AuthEmailSignupProfileField[]; // Required profile fields.
+    recaptchapublickey?: string; // Recaptcha public key.
+    recaptchachallengehash?: string; // Recaptcha challenge hash.
+    recaptchachallengeimage?: string; // Recaptcha challenge noscript image.
+    recaptchachallengejs?: string; // Recaptcha challenge js url.
+    warnings?: CoreWSExternalWarning[];
+};
+
+/**
+ * Profile field for signup.
+ */
+export type AuthEmailSignupProfileField = {
+    id?: number; // Profile field id.
+    shortname?: string; // Profile field shortname.
+    name?: string; // Profield field name.
+    datatype?: string; // Profield field datatype.
+    description?: string; // Profield field description.
+    descriptionformat: CoreTextFormat; // Description format (1 = HTML, 0 = MOODLE, 2 = PLAIN or 4 = MARKDOWN).
+    categoryid?: number; // Profield field category id.
+    categoryname?: string; // Profield field category name.
+    sortorder?: number; // Profield field sort order.
+    required?: number; // Profield field required.
+    locked?: number; // Profield field locked.
+    visible?: number; // Profield field visible.
+    forceunique?: number; // Profield field unique.
+    signup?: number; // Profield field in signup form.
+    defaultdata?: string; // Profield field default data.
+    defaultdataformat: CoreTextFormat; // Defaultdata format (1 = HTML, 0 = MOODLE, 2 = PLAIN or 4 = MARKDOWN).
+    param1?: string; // Profield field settings.
+    param2?: string; // Profield field settings.
+    param3?: string; // Profield field settings.
+    param4?: string; // Profield field settings.
+    param5?: string; // Profield field settings.
+};
+
+/**
+ * Category of profile fields for signup.
+ */
+export type AuthEmailSignupProfileFieldsCategory = {
+    id: number; // Category ID.
+    name: string; // Category name.
+    fields: AuthEmailSignupProfileField[]; // Field in the category.
 };
 
 /**

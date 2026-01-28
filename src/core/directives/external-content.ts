@@ -32,10 +32,10 @@ import { CoreLogger } from '@singletons/logger';
 import { CoreError } from '@classes/errors/error';
 import { CoreSite } from '@classes/sites/site';
 import { CoreEventObserver, CoreEvents } from '@singletons/events';
-import { CoreLinkOpenMethod, DownloadStatus } from '../constants';
+import { DownloadStatus } from '../constants';
 import { CoreNetwork } from '@services/network';
 import { Translate } from '@singletons';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { CoreDirectivesRegistry } from '@singletons/directives-registry';
 import { CorePromisedValue } from '@classes/promised-value';
 import { CorePlatform } from '@services/platform';
@@ -66,15 +66,15 @@ export class CoreExternalContentDirective implements AfterViewInit, OnChanges, O
     @Input() url?: string | null; // The URL to use in the element, either as src or href.
     @Input() posterUrl?: string | null; // The poster URL.
     /**
-     * @deprecated since 4.4. Use url instead. Keeping it a bit more time for backward compatibility.
+     * @deprecated since 4.4. Use url instead.
      */
     @Input() src?: string;
     /**
-     * @deprecated since 4.4. Use url instead. Keeping it a bit more time for backward compatibility.
+     * @deprecated since 4.4. Use url instead.
      */
     @Input() href?: string;
     /**
-     * @deprecated since 4.4. Use posterUrl instead. Keeping it a bit more time for backward compatibility.
+     * @deprecated since 4.4. Use posterUrl instead.
      */
     @Input() poster?: string;
 
@@ -370,7 +370,7 @@ export class CoreExternalContentDirective implements AfterViewInit, OnChanges, O
         const tagName = this.element.tagName;
         const openIn = tagName === 'A' && this.element.getAttribute('data-open-in');
 
-        if (openIn === CoreLinkOpenMethod.APP || openIn === CoreLinkOpenMethod.BROWSER) {
+        if (openIn === 'app' || openIn === 'browser') {
             // The file is meant to be opened in browser or InAppBrowser, don't use the downloaded URL because it won't work.
             if (!site.isSitePluginFileUrl(url)) {
                 return url;

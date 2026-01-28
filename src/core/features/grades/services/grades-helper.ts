@@ -353,7 +353,7 @@ export class CoreGradesHelperProvider {
         userId?: number,
         groupId?: number,
         siteId?: string,
-        ignoreCache = false,
+        ignoreCache: boolean = false,
     ): Promise<CoreGradesFormattedItem[]> {
         const grades = await CoreGrades.getGradeItems(courseId, userId, groupId, siteId, ignoreCache);
 
@@ -636,7 +636,7 @@ export class CoreGradesHelperProvider {
     async makeGradesMenu(
         gradingType?: number,
         moduleId?: number,
-        defaultLabel = '',
+        defaultLabel: string = '',
         defaultValue: string | number = '',
         scale?: string,
     ): Promise<CoreGradesMenuItem[]> {

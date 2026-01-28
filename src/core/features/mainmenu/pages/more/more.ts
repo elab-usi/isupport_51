@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, OnInit, OnDestroy, viewChildren } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { CoreSites } from '@services/sites';
 import { CoreQRScan } from '@services/qrscan';
-import {
-    CoreMainMenuDelegate,
-    CoreMainMenuHandlerToDisplay,
-    CoreMainMenuPageNavHandlerToDisplay,
-} from '../../services/mainmenu-delegate';
-import { CoreMainMenu } from '../../services/mainmenu';
+import { CoreMainMenuDelegate, CoreMainMenuHandlerData } from '../../services/mainmenu-delegate';
+import { CoreMainMenu, CoreMainMenuCustomItem } from '../../services/mainmenu';
 import { CoreEventObserver, CoreEvents } from '@singletons/events';
 import { CoreNavigator } from '@services/navigator';
 import { Translate } from '@singletons';
@@ -32,11 +28,6 @@ import { CoreSharedModule } from '@/core/shared.module';
 import { CoreMainMenuUserButtonComponent } from '../../components/user-menu-button/user-menu-button';
 import { CoreContentLinksHelper } from '@features/contentlinks/services/contentlinks-helper';
 import { CoreUrl } from '@singletons/url';
-import { CoreDynamicComponent } from '@components/dynamic-component/dynamic-component';
-import { ReloadableComponent } from '@coretypes/reloadable-component';
-import { CorePromiseUtils } from '@singletons/promise-utils';
-import { CoreCustomMenu, CoreCustomMenuItem } from '@features/mainmenu/services/custommenu';
-import { CoreCustomMenuItemComponent } from '@features/mainmenu/components/custom-menu-item/custom-menu-item';
 
 /**
  * Page that displays the more page of the app.
@@ -48,20 +39,16 @@ import { CoreCustomMenuItemComponent } from '@features/mainmenu/components/custo
     imports: [
         CoreSharedModule,
         CoreMainMenuUserButtonComponent,
-        CoreCustomMenuItemComponent,
     ],
 })
 export default class CoreMainMenuMorePage implements OnInit, OnDestroy {
 
-    readonly dynamicComponents = viewChildren<CoreDynamicComponent<ReloadableComponent>>(CoreDynamicComponent);
-
-    handlers?: CoreMainMenuHandlerToDisplay[];
+    handlers?: CoreMainMenuHandlerData[];
     handlersLoaded = false;
     showScanQR: boolean;
-    customItems?: CoreCustomMenuItem[];
-    hasComponentHandlers = false;
+    customItems?: CoreMainMenuCustomItem[];
 
-    protected allHandlers?: CoreMainMenuHandlerToDisplay[];
+    protected allHandlers?: CoreMainMenuHandlerData[];
     protected subscription!: Subscription;
     protected langObserver: CoreEventObserver;
     protected updateSiteObserver: CoreEventObserver;
@@ -71,7 +58,7 @@ export default class CoreMainMenuMorePage implements OnInit, OnDestroy {
         this.langObserver = CoreEvents.on(CoreEvents.LANGUAGE_CHANGED, () => this.loadCustomMenuItems());
 
         this.updateSiteObserver = CoreEvents.on(CoreEvents.SITE_UPDATED, async () => {
-            this.customItems = await CoreCustomMenu.getCustomMainMenuItems();
+            this.customItems = await CoreMainMenu.getCustomMenuItems();
         }, CoreSites.getCurrentSiteId());
 
         this.loadCustomMenuItems();
@@ -117,12 +104,12 @@ export default class CoreMainMenuMorePage implements OnInit, OnDestroy {
         }
 
         // Calculate the main handlers not to display them in this view.
-        const mainHandlers: CoreMainMenuHandlerToDisplay[] = CoreMainMenuDelegate.skipOnlyMoreHandlers(this.allHandlers)
+        const mainHandlers = this.allHandlers
+            .filter((handler) => !handler.onlyInMore)
             .slice(0, CoreMainMenu.getNumItems());
 
         // Get only the handlers that don't appear in the main view.
-        this.handlers = this.allHandlers.filter((handler) => mainHandlers.indexOf(handler) === -1);
-        this.hasComponentHandlers = this.handlers.some((handler) => 'component' in handler);
+        this.handlers = this.allHandlers.filter((handler) => mainHandlers.indexOf(handler) == -1);
 
         this.handlersLoaded = CoreMainMenuDelegate.areHandlersLoaded();
     }
@@ -131,7 +118,7 @@ export default class CoreMainMenuMorePage implements OnInit, OnDestroy {
      * Load custom menu items.
      */
     protected async loadCustomMenuItems(): Promise<void> {
-        this.customItems = await CoreCustomMenu.getCustomMainMenuItems();
+        this.customItems = await CoreMainMenu.getCustomMenuItems();
     }
 
     /**
@@ -139,10 +126,19 @@ export default class CoreMainMenuMorePage implements OnInit, OnDestroy {
      *
      * @param handler Handler to open.
      */
-    openHandler(handler: CoreMainMenuPageNavHandlerToDisplay): void {
+    openHandler(handler: CoreMainMenuHandlerData): void {
         const params = handler.pageParams;
 
         CoreNavigator.navigateToSitePath(handler.page, { params });
+    }
+
+    /**
+     * Open an embedded custom item.
+     *
+     * @param item Item to open.
+     */
+    openItem(item: CoreMainMenuCustomItem): void {
+        CoreViewer.openIframeViewer(item.label, item.url);
     }
 
     /**
@@ -175,25 +171,6 @@ export default class CoreMainMenuMorePage implements OnInit, OnDestroy {
                 displayCopyButton: true,
             });
         }
-    }
-
-    /**
-     * Refresh the data.
-     *
-     * @param event Event.
-     * @returns Promise resolved when done.
-     */
-    async refreshData(event?: HTMLIonRefresherElement): Promise<void> {
-        await CorePromiseUtils.ignoreErrors(Promise.all([
-            ...(this.dynamicComponents()?.map((component) =>
-                Promise.resolve(component.callComponentMethod('invalidateContent'))) || []),
-        ]));
-
-        await CorePromiseUtils.allPromisesIgnoringErrors(
-            this.dynamicComponents()?.map((component) => Promise.resolve(component.callComponentMethod('reloadContent'))),
-        );
-
-        event?.complete();
     }
 
 }

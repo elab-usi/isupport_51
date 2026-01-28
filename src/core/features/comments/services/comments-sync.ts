@@ -126,7 +126,7 @@ export class CoreCommentsSyncProvider extends CoreSyncBaseProvider<CoreCommentsS
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId?: string,
     ): Promise<CoreCommentsSyncResult | undefined> {
         const syncId = this.getSyncId(contextLevel, instanceId, component, itemId, area);
@@ -154,7 +154,7 @@ export class CoreCommentsSyncProvider extends CoreSyncBaseProvider<CoreCommentsS
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId?: string,
     ): Promise<CoreCommentsSyncResult> {
         siteId = siteId || CoreSites.getCurrentSiteId();
@@ -190,7 +190,7 @@ export class CoreCommentsSyncProvider extends CoreSyncBaseProvider<CoreCommentsS
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
         siteId: string,
     ): Promise<CoreCommentsSyncResult> {
 
@@ -318,7 +318,7 @@ export class CoreCommentsSyncProvider extends CoreSyncBaseProvider<CoreCommentsS
         instanceId: number,
         component: string,
         itemId: number,
-        area = '',
+        area: string = '',
     ): string {
         return `${contextLevel}#${instanceId}#${component}#${itemId}#${area}`;
     }

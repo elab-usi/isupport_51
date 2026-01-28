@@ -1,4 +1,4 @@
-import { defineConfig } from 'eslint/config';
+import { defineConfig } from "eslint/config";
 import angular from 'angular-eslint';
 import tseslint from 'typescript-eslint';
 import eslint from '@eslint/js';
@@ -45,7 +45,7 @@ const appConfig = {
             ...globals.es6,
         },
         parserOptions: {
-            project: 'tsconfig.app.json', // Use tsconfig.app instead of tsconfig because it limits the files loaded by TS.
+            project: 'tsconfig.json',
             sourceType: 'module',
         },
     },
@@ -54,7 +54,7 @@ const appConfig = {
     },
     rules: {
         '@angular-eslint/component-class-suffix': ['error', { suffixes: ['Component', 'Page'] }],
-        '@angular-eslint/no-output-on-prefix': 'off', // @todo: The recommendation is to enable this rule.
+        '@angular-eslint/no-output-on-prefix': 'off',
         '@angular-eslint/prefer-signals': [
             'error',
             {
@@ -83,12 +83,8 @@ const appConfig = {
                 },
             },
         ],
-        '@typescript-eslint/no-unused-expressions': [ // @todo: The default (recommended) behaviour is not allowing short circuit.
-            'error',
-            {
-                allowShortCircuit: true,
-            },
-        ],
+        '@typescript-eslint/no-unsafe-function-type': 'off',
+        '@typescript-eslint/no-unused-expressions': 'off',
         '@typescript-eslint/explicit-member-accessibility': [
             'error',
             {
@@ -101,6 +97,27 @@ const appConfig = {
                 allowArgumentsExplicitlyTypedAsAny: true,
             },
         ],
+        '@stylistic/lines-between-class-members': [
+            'error',
+            'always',
+            {
+                exceptAfterSingleLine: true,
+            },
+        ],
+        '@stylistic/member-delimiter-style': [
+            'error',
+            {
+                multiline: {
+                    delimiter: 'semi',
+                    requireLast: true,
+                },
+                singleline: {
+                    delimiter: 'semi',
+                    requireLast: false,
+                },
+            },
+        ],
+        '@typescript-eslint/member-ordering': 'off',
         '@typescript-eslint/naming-convention': [
             'error',
             {
@@ -145,8 +162,27 @@ const appConfig = {
         ],
         '@typescript-eslint/no-deprecated': 'error',
         '@typescript-eslint/no-empty-function': 'error',
-        '@typescript-eslint/no-inferrable-types': 'error',
-        '@typescript-eslint/no-non-null-assertion': 'warn', // @todo: Set it to 'error' when all have been fixed.
+        '@typescript-eslint/no-empty-interface': 'off',
+        '@typescript-eslint/no-explicit-any': 'warn',
+        '@typescript-eslint/no-inferrable-types': [
+            'error',
+            {
+                ignoreParameters: true,
+            },
+        ],
+        '@typescript-eslint/no-non-null-assertion': 'warn',
+        '@typescript-eslint/no-redeclare': 'error',
+        '@typescript-eslint/no-this-alias': 'error',
+        '@typescript-eslint/no-unused-vars': 'error',
+        '@stylistic/quotes': [
+            'error',
+            'single',
+        ],
+        '@stylistic/semi': [
+            'error',
+            'always',
+        ],
+        '@stylistic/type-annotation-spacing': 'error',
         'header/header': [
             2,
             'line',
@@ -175,9 +211,14 @@ const appConfig = {
             },
         ],
         'arrow-body-style': ['error', 'as-needed'],
+        'array-bracket-spacing': ['error', 'never'],
+        'comma-dangle': ['error', 'always-multiline'],
+        'constructor-super': 'error',
         'curly': 'error',
-        'eqeqeq': ['warn', 'always'],
-        'id-denylist': [
+        'eol-last': 'error',
+        'function-call-argument-newline': ['error', 'consistent'],
+        'function-paren-newline': ['error', 'multiline-arguments'],
+        'id-blacklist': [
             'error',
             'any',
             'Number',
@@ -189,6 +230,7 @@ const appConfig = {
             'Undefined',
             'undefined',
         ],
+        'id-match': 'error',
         'jsdoc/check-alignment': 'error',
         'jsdoc/check-param-names': [
             'error',
@@ -205,6 +247,7 @@ const appConfig = {
         ],
         'jsdoc/check-values': 'off',
         'jsdoc/require-param-type': 'off',
+        'jsdoc/require-param': 'off',
         'jsdoc/require-returns-type': 'off',
         'jsdoc/tag-lines': [
             'error',
@@ -213,76 +256,49 @@ const appConfig = {
                 startLines: 1,
             },
         ],
+        'linebreak-style': [
+            'error',
+            'unix',
+        ],
+        'max-len': [
+            'error',
+            {
+                code: 132,
+            },
+        ],
+        'new-parens': 'error',
         'no-bitwise': 'error',
+        'no-cond-assign': 'error',
         'no-console': 'error',
+        'no-debugger': 'error',
+        'no-duplicate-case': 'error',
         'no-duplicate-imports': 'error',
+        'no-empty': 'error',
         'no-eval': 'error',
+        'no-fallthrough': 'off',
         'no-invalid-this': 'error',
+        'no-irregular-whitespace': 'error',
+        'no-multiple-empty-lines': ['error', { max: 1 }],
         'no-new-wrappers': 'error',
         'no-restricted-imports': ['error', {
             'name': 'dayjs',
             'message': 'Please use the dayjs wrapper from @/core/utils/dayjs instead.',
         }],
         'no-sequences': 'error',
+        'no-trailing-spaces': 'error',
+        'no-unused-labels': 'error',
+        'no-var': 'error',
+        'object-curly-spacing': ['error', 'always'],
         'one-var': ['error', 'never'],
-        'prefer-arrow/prefer-arrow-functions': [
-            'error',
-            {
-                singleReturnOnly: true,
-                allowStandaloneDeclarations: true,
-            },
-        ],
-        '@stylistic/array-bracket-spacing': ['error', 'never'],
-        '@stylistic/comma-dangle': ['error', 'always-multiline'],
-        '@stylistic/eol-last': 'error',
-        '@stylistic/function-call-argument-newline': ['error', 'consistent'],
-        '@stylistic/function-paren-newline': ['error', 'multiline-arguments'],
-        '@stylistic/linebreak-style': [
-            'error',
-            'unix',
-        ],
-        '@stylistic/lines-between-class-members': [
-            'error',
-            'always',
-            {
-                exceptAfterSingleLine: true,
-            },
-        ],
-        '@stylistic/max-len': [
-            'error',
-            {
-                code: 132,
-            },
-        ],
-        '@stylistic/member-delimiter-style': [
-            'error',
-            {
-                multiline: {
-                    delimiter: 'semi',
-                    requireLast: true,
-                },
-                singleline: {
-                    delimiter: 'semi',
-                    requireLast: false,
-                },
-            },
-        ],
-        '@stylistic/new-parens': 'error',
-        '@stylistic/no-multiple-empty-lines': ['error', { max: 1 }],
-        '@stylistic/no-trailing-spaces': 'error',
-        '@stylistic/object-curly-spacing': ['error', 'always'],
-        '@stylistic/quotes': [
-            'error',
-            'single',
-        ],
-        '@stylistic/padded-blocks': [
+        'padded-blocks': [
             'error',
             {
                 classes: 'always',
+                blocks: 'never',
                 switches: 'never',
             },
         ],
-        '@stylistic/padding-line-between-statements': [
+        'padding-line-between-statements': [
             'error',
             {
                 blankLine: 'always',
@@ -295,15 +311,20 @@ const appConfig = {
                 next: 'function',
             },
         ],
-        '@stylistic/quote-props': [
+        'prefer-arrow/prefer-arrow-functions': [
+            'error',
+            {
+                singleReturnOnly: true,
+                allowStandaloneDeclarations: true,
+            },
+        ],
+        'prefer-const': 'error',
+        'prefer-spread': 'off',
+        'quote-props': [
             'error',
             'consistent-as-needed',
         ],
-        '@stylistic/semi': [
-            'error',
-            'always',
-        ],
-        '@stylistic/spaced-comment': [
+        'spaced-comment': [
             'error',
             'always',
             {
@@ -312,61 +333,29 @@ const appConfig = {
                 ],
             },
         ],
-        '@stylistic/type-annotation-spacing': 'error',
+        'use-isnan': 'error',
         'yoda': 'error',
     },
 };
 
-const cordovaPluginConfig = {
-    ...appConfig,
-    languageOptions: {
-        ...appConfig.languageOptions,
-        parserOptions: {
-            ...appConfig.languageOptions.parserOptions,
-            project: 'cordova-plugin-moodleapp/tsconfig.json', // Use the tsconfig of the cordova plugin.
-        },
+var testsConfig = Object.assign({}, appConfig);
+testsConfig.rules['padded-blocks'] = [
+    'error',
+    {
+        classes: 'always',
+        switches: 'never',
     },
-};
-
-const testsConfig = {
-    ...appConfig,
-    languageOptions: {
-        ...appConfig.languageOptions,
-        parserOptions: {
-            ...appConfig.languageOptions.parserOptions,
-            project: 'tsconfig.spec.json', // Use tsconfig.spec because it includes test files.
-        },
-    },
-    rules: {
-        ...appConfig.rules,
-        'jest/expect-expect': 'off',
-        'jest/no-done-callback': 'off',
-    },
-    plugins: {
-        ...appConfig.plugins,
-        jest,
-    },
-    extends: [
-        ...appConfig.extends,
-        'jest/flat/recommended',
-    ],
-};
+];
+testsConfig.rules['jest/expect-expect'] = 'off';
+testsConfig.rules['jest/no-done-callback'] = 'off';
+testsConfig.plugins.jest = jest;
+testsConfig.extends.push('jest/flat/recommended');
 
 export default defineConfig([
-    Object.assign({
-        files: ['src/**/*.ts'],
-        ignores: [
-            'src/**/tests/**',
-            'src/**/stories/**',
-            'src/testing/**',
-            'src/**/*.test.ts',
-            'src/**/*.stories.*'
-        ],
-    }, appConfig),
-    Object.assign({ files: ['cordova-plugin-moodleapp/src/ts/**/*.ts'] }, cordovaPluginConfig),
-    Object.assign({ files: ['src/**/*.test.ts'] }, testsConfig),
+    Object.assign({ files: ['**/*.ts'] }, appConfig),
+    Object.assign({ files: ['**/*.test.ts'] }, testsConfig),
     {
-        files: ['src/**/*.html'],
+        files: ['**/*.html'],
         extends: [...angular.configs.templateRecommended,],
         rules: {
             '@angular-eslint/template/alt-text': 'error',
@@ -380,6 +369,9 @@ export default defineConfig([
             '@angular-eslint/template/prefer-control-flow': 'warn',
             'max-len': ['warn', { code: 140 }],
         },
+    },
+    {
+        files: ['**/*.component.ts'],
     },
     {
         ignores: ['**/*.js', '**/.*'],

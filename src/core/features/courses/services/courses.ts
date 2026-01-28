@@ -122,7 +122,7 @@ export class CoreCoursesProvider {
      */
     async getCategories(
         categoryId: number,
-        addSubcategories = false,
+        addSubcategories: boolean = false,
         siteId?: string,
     ): Promise<CoreCourseGetCategoriesWSResponse> {
         const site = await CoreSites.getSite(siteId);
@@ -456,7 +456,7 @@ export class CoreCoursesProvider {
      * @returns Promise resolved with the courses.
      */
     async getCoursesByField(
-        field = '',
+        field: string = '',
         value: string | number = '',
         siteId?: string,
     ): Promise<CoreCourseSearchedData[]> {
@@ -478,7 +478,7 @@ export class CoreCoursesProvider {
      * @returns Observable that returns the courses.
      */
     getCoursesByFieldObservable(
-        field = '',
+        field: string = '',
         value: string | number = '',
         options: CoreSitesCommonWSOptions = {},
     ): WSObservable<CoreCourseSearchedData[]> {
@@ -551,7 +551,7 @@ export class CoreCoursesProvider {
      * @param value The value to match.
      * @returns Cache key.
      */
-    protected getCoursesByFieldCacheKey(field = '', value: string | number = ''): string {
+    protected getCoursesByFieldCacheKey(field: string = '', value: string | number = ''): string {
         return `${CoreCoursesProvider.ROOT_CACHE_KEY}coursesbyfield:${field}:${value}`;
     }
 
@@ -889,7 +889,7 @@ export class CoreCoursesProvider {
      * @returns Promise resolved with the courses.
      */
     async getUserCourses(
-        preferCache = false,
+        preferCache: boolean = false,
         siteId?: string,
         strategy?: CoreSitesReadingStrategy,
     ): Promise<CoreEnrolledCourseData[]> {
@@ -899,31 +899,6 @@ export class CoreCoursesProvider {
             readingStrategy: strategy,
             siteId,
         }));
-    }
-
-    /**
-     * Get user courses WS observable.
-     *
-     * This function can be modified to configure the data sent in the request or change the method.
-     *
-     * @param site Site.
-     * @param wsParams WS parameters.
-     * @param preSets PreSets.
-     * @param options Options.
-     * @returns Observable that returns the courses.
-     */
-    protected getWSUserCoursesObservable(
-        site: CoreSite,
-        wsParams: CoreEnrolGetUsersCoursesWSParams,
-        preSets: CoreSiteWSPreSets = {},
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        options: CoreSitesCommonWSOptions = {},
-    ): WSObservable<CoreEnrolGetUsersCoursesWSResponse> {
-        return site.readObservable<CoreEnrolGetUsersCoursesWSResponse>(
-            'core_enrol_get_users_courses',
-            wsParams,
-            preSets,
-        );
     }
 
     /**
@@ -952,7 +927,11 @@ export class CoreCoursesProvider {
                 wsParams.returnusercount = false;
             }
 
-            const observable = this.getWSUserCoursesObservable(site, wsParams, preSets, options);
+            const observable = site.readObservable<CoreEnrolGetUsersCoursesWSResponse>(
+                'core_enrol_get_users_courses',
+                wsParams,
+                preSets,
+            );
 
             return observable.pipe(map(courses => {
                 if (this.userCoursesIds) {
@@ -1083,7 +1062,7 @@ export class CoreCoursesProvider {
      * @param value The value to match.
      * @param siteId Site Id. If not defined, use current site.
      */
-    async invalidateCoursesByField(field = '', value: number | string = '', siteId?: string): Promise<void> {
+    async invalidateCoursesByField(field: string = '', value: number | string = '', siteId?: string): Promise<void> {
         if (typeof value === 'string' && value.length === 0) {
             return;
         }
@@ -1196,9 +1175,9 @@ export class CoreCoursesProvider {
      */
     async search(
         text: string,
-        page = 0,
+        page: number = 0,
         perPage: number = CoreCoursesProvider.SEARCH_PER_PAGE,
-        limitToEnrolled = false,
+        limitToEnrolled: boolean = false,
         siteId?: string,
     ): Promise<{ total: number; courses: CoreCourseBasicSearchedData[] }> {
         const site = await CoreSites.getSite(siteId);
@@ -1297,7 +1276,7 @@ export type CoreCoursesDashboardDownloadEnabledChangedEventData = {
 /**
  * Params of core_enrol_get_users_courses WS.
  */
-export type CoreEnrolGetUsersCoursesWSParams = {
+type CoreEnrolGetUsersCoursesWSParams = {
     userid: number; // User id.
     returnusercount?: boolean; // Include count of enrolled users for each course? This can add several seconds to the response
     // time if a user is on several large courses, so set this to false if the value will not be used to improve performance.
@@ -1306,7 +1285,7 @@ export type CoreEnrolGetUsersCoursesWSParams = {
 /**
  * Data returned by core_enrol_get_users_courses WS.
  */
-export type CoreEnrolGetUsersCoursesWSResponse = (CoreEnrolledCourseData & {
+type CoreEnrolGetUsersCoursesWSResponse = (CoreEnrolledCourseData & {
     category?: number; // Course category id.
 })[];
 

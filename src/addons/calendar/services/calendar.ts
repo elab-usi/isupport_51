@@ -28,7 +28,7 @@ import { CoreWSExternalWarning, CoreWSDate } from '@services/ws';
 import { dayjs } from '@/core/utils/dayjs';
 import { AddonCalendarEventDBRecord } from './database/calendar';
 import { CoreCourses, CoreCourseSummaryExporterData } from '@features/courses/services/courses';
-import { ContextLevel, CoreCacheUpdateFrequency, CoreTimeConstants } from '@/core/constants';
+import { ContextLevel, CoreCacheUpdateFrequency, CoreConstants } from '@/core/constants';
 import { CoreWSError } from '@classes/errors/wserror';
 import { ApplicationInit, makeSingleton, Translate } from '@singletons';
 import { AddonCalendarOfflineEventDBRecord } from './database/calendar-offline';
@@ -328,7 +328,7 @@ export class AddonCalendarProvider {
 
             if (dayjs(start).isSame(end, 'day')) {
                 // Event starts and ends the same day.
-                if (event.timeduration == CoreTimeConstants.SECONDS_DAY) {
+                if (event.timeduration == CoreConstants.SECONDS_DAY) {
                     time = Translate.instant('addon.calendar.allday');
                 } else {
                     time = getStartTimeHtml(CoreTime.userDate(start, format)) + ' <strong>&raquo;</strong> ' +
@@ -438,7 +438,7 @@ export class AddonCalendarProvider {
      * @returns Promise resolved with an object indicating the types.
      * @since 3.7
      */
-    async getAllowedEventTypes(courseId?: number, siteId?: string): Promise<{ [name: string]: boolean }> {
+    async getAllowedEventTypes(courseId?: number, siteId?: string): Promise<{[name: string]: boolean}> {
         const site = await CoreSites.getSite(siteId);
         const params: AddonCalendarGetAllowedEventTypesWSParams = {};
         const preSets: CoreSiteWSPreSets = {
@@ -451,7 +451,7 @@ export class AddonCalendarProvider {
             await site.read('core_calendar_get_allowed_event_types', params, preSets);
 
         // Convert the array to an object.
-        const result: { [name: string]: boolean } = {};
+        const result: {[name: string]: boolean} = {};
         if (response.allowedeventtypes) {
             response.allowedeventtypes.forEach((type) => {
                 result[type] = true;
@@ -511,7 +511,7 @@ export class AddonCalendarProvider {
      * @param useCommonWords Whether to use common words like "Today", "Yesterday", etc.
      * @returns The formatted date/time.
      */
-    getDayRepresentation(time: number, useCommonWords = true): string {
+    getDayRepresentation(time: number, useCommonWords: boolean = true): string {
 
         if (!useCommonWords) {
             // We don't want words, just a date.
@@ -818,7 +818,7 @@ export class AddonCalendarProvider {
      */
     async getEventsList(
         initialTime?: number,
-        daysToStart = 0,
+        daysToStart: number = 0,
         daysInterval: number = ADDON_CALENDAR_DAYS_INTERVAL,
         siteId?: string,
     ): Promise<AddonCalendarGetEventsEvent[]> {
@@ -828,8 +828,8 @@ export class AddonCalendarProvider {
         const site = await CoreSites.getSite(siteId);
         siteId = site.getId();
 
-        const start = initialTime + (CoreTimeConstants.SECONDS_DAY * daysToStart);
-        const end = start + (CoreTimeConstants.SECONDS_DAY * daysInterval) - 1;
+        const start = initialTime + (CoreConstants.SECONDS_DAY * daysToStart);
+        const end = start + (CoreConstants.SECONDS_DAY * daysInterval) - 1;
 
         const events = {
             courseids: <number[]> [],
@@ -1304,7 +1304,7 @@ export class AddonCalendarProvider {
      * @returns Promise resolved when all the notifications have been scheduled.
      */
     protected async updateEventsReminders(
-        events: ({ id: number; timestart: number; name: string })[],
+        events: ({ id: number; timestart: number; name: string})[],
         siteId: string,
     ): Promise<void> {
         await Promise.all(events.map(async (event) => {
@@ -1478,7 +1478,7 @@ export class AddonCalendarProvider {
         eventId: number | undefined,
         formData: AddonCalendarSubmitCreateUpdateFormDataWSParams,
         options: AddonCalendarSubmitEventOptions = {},
-    ): Promise<{ sent: boolean; event: AddonCalendarOfflineEventDBRecord | AddonCalendarEvent }> {
+    ): Promise<{sent: boolean; event: AddonCalendarOfflineEventDBRecord | AddonCalendarEvent}> {
 
         const siteId = options.siteId || CoreSites.getCurrentSiteId();
 
@@ -1538,7 +1538,7 @@ export class AddonCalendarProvider {
      * @returns Promise resolved when done.
      */
     async submitEventOnline(
-        eventId = 0,
+        eventId: number = 0,
         formData: AddonCalendarSubmitCreateUpdateFormDataWSParams,
         siteId?: string,
     ): Promise<AddonCalendarEvent> {

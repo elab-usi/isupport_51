@@ -188,11 +188,9 @@ export default class CoreUserParticipantsPage implements OnInit, AfterViewInit, 
      * @param reload Whether to reload the list or load the next page.
      */
     private async fetchParticipants(reload: boolean): Promise<void> {
-        if (reload) {
-            await this.participants.reload();
-        } else {
-            await this.participants.load();
-        }
+        reload
+            ? await this.participants.reload()
+            : await this.participants.load();
 
         this.fetchMoreParticipantsFailed = false;
     }

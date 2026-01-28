@@ -43,7 +43,7 @@ export class AddonFilterMultilang2HandlerService extends CoreFilterDefaultHandle
             return text;
         }
 
-        const currentLang = CoreLang.getLanguageAppVariant(await CoreLang.getCurrentLanguage());
+        const currentLang = await CoreLang.getCurrentLanguage();
         this.replacementDone = false;
         const parentLanguage = CoreLang.getParentLanguage();
 
@@ -85,17 +85,9 @@ export class AddonFilterMultilang2HandlerService extends CoreFilterDefaultHandle
     protected replaceLangs(replaceLang: string, langBlock: string[], parentLanguage: string | undefined): string {
         // Normalize languages.
         const blockLangs = (langBlock[1] ?? '').replace(/ /g, '').replace(/_/g, '-').toLowerCase().split(',');
-        const langSuffix = CoreLang.getLanguageSuffix();
-
         const blockText = langBlock[2] ?? '';
 
-        for (let blockLang of blockLangs) {
-            if (langSuffix) {
-                blockLang = blockLang.endsWith(`-${langSuffix}`)
-                    ? blockLang.replace(`-${langSuffix}`, `_${langSuffix}`)
-                    : blockLang;
-            }
-
+        for (const blockLang of blockLangs) {
             /* We don't check for empty values of blockLang as they simply don't
              * match any language and they don't produce any errors or warnings.
              */

@@ -29,7 +29,6 @@ import {
     ADDON_MOD_SCORM_GO_OFFLINE_EVENT,
     AddonModScormMode,
 } from '../constants';
-import { CoreTimeConstants } from '@/core/constants';
 
 // Standard Data Type Definition.
 let CMI_STRING_256 = '^[\\u0000-\\uFFFF]{0,255}$';
@@ -894,10 +893,7 @@ export class AddonModScormDataModel12 {
                             // Store data.
                             if (this.errorCode == '0') {
                                 if (this.scorm.autocommit && !this.timeout) {
-                                    this.timeout = window.setTimeout(
-                                        () => this.LMSCommit(''),
-                                        CoreTimeConstants.MILLISECONDS_MINUTE,
-                                    );
+                                    this.timeout = window.setTimeout(() => this.LMSCommit(''), 60000);
                                 }
 
                                 const range = this.dataModel[this.scoId][elementModel].range;

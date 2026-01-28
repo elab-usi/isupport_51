@@ -27,7 +27,7 @@ import {
     ViewChild,
     inject,
 } from '@angular/core';
-import type { AsyncDirective } from '@coretypes/async-directive';
+import { AsyncDirective } from '@classes/async-directive';
 import { CoreSwipeSlidesItemsManager } from '@classes/items-management/swipe-slides-items-manager';
 import { CorePromisedValue } from '@classes/promised-value';
 import { IonContent } from '@ionic/angular';
@@ -83,7 +83,7 @@ export class CoreSwipeSlidesComponent<Item = unknown> implements OnChanges, OnDe
         });
     }
 
-    @ContentChild(TemplateRef) template?: TemplateRef<{ item: Item; active: boolean }>; // Template defined by the content.
+    @ContentChild(TemplateRef) template?: TemplateRef<{item: Item; active: boolean}>; // Template defined by the content.
 
     protected unsubscribe?: () => void;
     protected resizeListener: CoreEventObserver;

@@ -992,7 +992,7 @@ export class AddonModDataHelperProvider {
     ): Promise<number | CoreFileUploaderStoreFilesResult>;
     async uploadOrStoreFiles(
         dataId: number,
-        itemId = 0,
+        itemId: number = 0,
         entryId: number,
         fieldId: number,
         files: CoreFileEntry[],

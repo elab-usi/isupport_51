@@ -218,11 +218,9 @@ export class AddonModSurveyIndexComponent extends CoreCourseModuleMainActivityCo
                     );
 
                     // Update the view.
-                    if (prefetched) {
-                        this.showLoadingAndFetch(false, false);
-                    } else {
+                    prefetched ?
+                        this.showLoadingAndFetch(false, false) :
                         this.showLoadingAndRefresh(false);
-                    }
                 } catch {
                     // Prefetch failed, refresh the data.
                     this.showLoadingAndRefresh(false);

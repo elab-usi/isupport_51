@@ -17,6 +17,7 @@ import { CoreLogger } from '@singletons/logger';
 import { CoreSites } from '@services/sites';
 import { CoreUrl } from '@singletons/url';
 import { makeSingleton } from '@singletons';
+import { CoreText } from '@singletons/text';
 import { CorePromiseUtils } from '@singletons/promise-utils';
 import { CoreNavigator } from '@services/navigator';
 
@@ -96,7 +97,7 @@ export interface CoreContentLinksHandler {
 /**
  * Action to perform when a link is clicked.
  */
-export type CoreContentLinksAction = {
+export interface CoreContentLinksAction {
     /**
      * A message to identify the action. Default: 'core.view'.
      */
@@ -118,12 +119,12 @@ export type CoreContentLinksAction = {
      * @param siteId The site ID.
      */
     action(siteId: string): Promise<void>;
-};
+}
 
 /**
  * Actions and priority for a handler and URL.
  */
-export type CoreContentLinksHandlerActions = {
+export interface CoreContentLinksHandlerActions {
     /**
      * Handler's priority.
      */
@@ -133,7 +134,7 @@ export type CoreContentLinksHandlerActions = {
      * List of actions.
      */
     actions: CoreContentLinksAction[];
-};
+}
 
 /**
  * Delegate to register handlers to handle links.
@@ -174,7 +175,7 @@ export class CoreContentLinksDelegateService {
         const linkActions: CoreContentLinksHandlerActions[] = [];
         const promises: Promise<void>[] = [];
         const params = CoreUrl.extractUrlParams(url);
-        const relativeUrl = await site.getRelativeUrl(url);
+        const relativeUrl = CoreText.addStartingSlash(CoreUrl.toRelativeURL(site.getURL(), url));
 
         for (const name in this.handlers) {
             const handler = this.handlers[name];

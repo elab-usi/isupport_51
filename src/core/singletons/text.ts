@@ -17,7 +17,6 @@ import { CoreToasts } from '@services/overlays/toasts';
 import { Locutus } from './locutus';
 import { CoreError } from '@classes/errors/error';
 import { convertTextToHTMLElement } from '../utils/create-html-element';
-import { CoreBytesConstants } from '../constants';
 
 /**
  * Singleton with helper functions for text manipulation.
@@ -86,7 +85,7 @@ export class CoreText {
      * @param precision Number of digits after the decimal separator.
      * @returns Size in human readable format.
      */
-    static bytesToSize(bytes: number, precision = 2): string {
+    static bytesToSize(bytes: number, precision: number = 2): string {
         if (bytes === undefined || bytes === null || bytes < 0) {
             return Translate.instant('core.notapplicable');
         }
@@ -99,10 +98,10 @@ export class CoreText {
         const units = Translate.instant(keys);
         let pos = 0;
 
-        if (bytes >= CoreBytesConstants.KILOBYTE) {
-            while (bytes >= CoreBytesConstants.KILOBYTE) {
+        if (bytes >= 1024) {
+            while (bytes >= 1024) {
                 pos++;
-                bytes = bytes / CoreBytesConstants.UNIT_MULTIPLIER;
+                bytes = bytes / 1024;
             }
             // Round to "precision" decimals if needed.
             bytes = Number(Math.round(parseFloat(bytes + 'e+' + precision)) + 'e-' + precision);
@@ -541,7 +540,7 @@ export class CoreText {
      * @param decimals Number of decimals. By default, 2.
      * @returns Rounded number.
      */
-    static roundToDecimals(num: number, decimals = 2): number {
+    static roundToDecimals(num: number, decimals: number = 2): number {
         const multiplier = Math.pow(10, decimals);
 
         return Math.round(num * multiplier) / multiplier;

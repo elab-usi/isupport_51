@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ContextLevel, CoreRefreshIcon, CoreSyncIcon } from '@/core/constants';
+import { ContextLevel, CoreConstants } from '@/core/constants';
 import { Component, OnDestroy, OnInit, AfterViewInit, ElementRef, inject, viewChild } from '@angular/core';
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
 import { CoreRoutedItemsManagerSourcesTracker } from '@classes/items-management/routed-items-manager-sources-tracker';
@@ -121,8 +121,8 @@ export default class AddonModForumDiscussionPage implements OnInit, AfterViewIni
         isprivatereply: false,
     };
 
-    refreshIcon = CoreRefreshIcon.LOADING;
-    syncIcon = CoreSyncIcon.LOADING;
+    refreshIcon = CoreConstants.ICON_LOADING;
+    syncIcon = CoreConstants.ICON_LOADING;
     discussionStr = '';
     component = ADDON_MOD_FORUM_COMPONENT_LEGACY;
     cmId?: number;
@@ -568,8 +568,8 @@ export default class AddonModForumDiscussionPage implements OnInit, AfterViewIni
             CoreAlerts.showError(error);
         } finally {
             this.discussionLoaded = true;
-            this.refreshIcon = CoreRefreshIcon.REFRESH;
-            this.syncIcon = CoreSyncIcon.SYNC;
+            this.refreshIcon = CoreConstants.ICON_REFRESH;
+            this.syncIcon = CoreConstants.ICON_SYNC;
 
             if (forceMarkAsRead || (hasUnreadPosts && this.trackPosts)) {
                 // Add log in Moodle and mark unread posts as readed.
@@ -657,7 +657,7 @@ export default class AddonModForumDiscussionPage implements OnInit, AfterViewIni
      * @param showErrors If show errors to the user of hide them.
      * @returns Promise resolved when done.
      */
-    async doRefresh(refresher?: HTMLIonRefresherElement | null, done?: () => void, showErrors = false): Promise<void> {
+    async doRefresh(refresher?: HTMLIonRefresherElement | null, done?: () => void, showErrors: boolean = false): Promise<void> {
         if (this.discussionLoaded) {
             await this.refreshPosts(true, showErrors).finally(() => {
                 refresher?.complete();
@@ -675,8 +675,8 @@ export default class AddonModForumDiscussionPage implements OnInit, AfterViewIni
      */
     async refreshPosts(sync?: boolean, showErrors?: boolean): Promise<void> {
         this.content().scrollToTop();
-        this.refreshIcon = CoreRefreshIcon.LOADING;
-        this.syncIcon = CoreSyncIcon.LOADING;
+        this.refreshIcon = CoreConstants.ICON_LOADING;
+        this.syncIcon = CoreConstants.ICON_LOADING;
 
         const promises: Promise<void>[] = [];
 

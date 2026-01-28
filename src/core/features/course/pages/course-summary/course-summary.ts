@@ -43,7 +43,6 @@ import { CORE_COURSES_MY_COURSES_UPDATED_EVENT, CoreCoursesMyCoursesUpdatedEvent
 import { CoreAlerts } from '@services/overlays/alerts';
 import { CoreRemindersDateComponent } from '../../../reminders/components/date/date';
 import { CoreSharedModule } from '@/core/shared.module';
-import { CoreTimeConstants } from '@/core/constants';
 
 /**
  * Page that shows the summary of a course including buttons to enrol and other available options.
@@ -455,7 +454,7 @@ export default class CoreCourseSummaryPage implements OnInit, OnDestroy {
             await CoreCourses.getUserCourse(this.courseId);
         } catch {
             // Not enrolled, wait a bit and try again.
-            if (this.pageDestroyed || (Date.now() - this.waitStart > CoreTimeConstants.MILLISECONDS_MINUTE)) {
+            if (this.pageDestroyed || (Date.now() - this.waitStart > 60000)) {
                 // Max time reached or the user left the view, stop.
                 return;
             }

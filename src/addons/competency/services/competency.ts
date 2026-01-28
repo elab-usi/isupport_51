@@ -39,7 +39,7 @@ export class AddonCompetencyProvider {
      * @param options Site ID or site object.
      * @returns Whether competencies are enabled.
      */
-    async areCompetenciesEnabled(options?: { siteId?: string; site?: CoreSite }): Promise<boolean> {
+    async areCompetenciesEnabled(options?: {siteId?: string; site?: CoreSite}): Promise<boolean> {
         const site = options?.site ? options.site : await CoreSites.getSite(options?.siteId);
 
         if (!site) {
@@ -49,6 +49,17 @@ export class AddonCompetencyProvider {
         return site.canUseAdvancedFeature('enablecompetencies') &&
             !(site.isFeatureDisabled('CoreUserDelegate_AddonCompetency') &&
             site.isFeatureDisabled('CoreCourseOptionsDelegate_AddonCompetency'));
+    }
+
+    /**
+     * Check if all competencies features are disabled.
+     *
+     * @param siteId Site ID. If not defined, current site.
+     * @returns Promise resolved with boolean: whether all competency features are disabled.
+     * @deprecated since 4.4. Use areCompetenciesEnabled instead.
+     */
+    async allCompetenciesDisabled(siteId?: string): Promise<boolean> {
+        return !(await this.areCompetenciesEnabled({ siteId }));
     }
 
     /**

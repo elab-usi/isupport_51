@@ -48,7 +48,7 @@ export interface CoreFileUploaderHandler extends CoreDelegateHandler {
 /**
  * Data needed to render the handler in the file picker. It must be returned by the handler.
  */
-export type CoreFileUploaderHandlerData = {
+export interface CoreFileUploaderHandlerData {
     /**
      * The title to display in the handler.
      */
@@ -89,12 +89,12 @@ export type CoreFileUploaderHandlerData = {
      * @param mimetypes List of supported mimetypes. If undefined, all mimetypes supported.
      */
     afterRender?(maxSize?: number, upload?: boolean, allowOffline?: boolean, mimetypes?: string[]): void;
-};
+}
 
 /**
  * The result of clicking a handler.
  */
-export type CoreFileUploaderHandlerResult = {
+export interface CoreFileUploaderHandlerResult {
     /**
      * Whether the file was treated (uploaded or copied to tmp folder).
      */
@@ -119,12 +119,12 @@ export type CoreFileUploaderHandlerResult = {
      * The result of picking/uploading the file. Ignored if treated=false.
      */
     result?: CoreWSUploadFileResult | FileEntry;
-};
+}
 
 /**
  * Data returned by the delegate for each handler.
  */
-export type CoreFileUploaderHandlerDataToReturn = CoreFileUploaderHandlerData & {
+export interface CoreFileUploaderHandlerDataToReturn extends CoreFileUploaderHandlerData {
     /**
      * Handler's priority.
      */
@@ -134,7 +134,7 @@ export type CoreFileUploaderHandlerDataToReturn = CoreFileUploaderHandlerData & 
      * Supported mimetypes.
      */
     mimetypes?: string[];
-};
+}
 
 /**
  * Delegate to register handlers to be shown in the file picker.
