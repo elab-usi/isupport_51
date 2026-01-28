@@ -1,14 +1,14 @@
 {
-    "name": "moodlemobile",
+    "name": "isupportswiss",
     "version": "5.1.0",
-    "description": "The official app for Moodle.",
+    "description": "The official app of iSupport Swiss.",
     "author": {
-        "name": "Moodle Pty Ltd.",
-        "email": "mobile@moodle.com"
+        "name": "eLab",
+        "email": "elab@usi.ch"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/moodlehq/moodleapp.git"
+        "url": "https://github.com/elab-usi/isupport_51"
     },
     "license": "Apache-2.0",
     "licenses": [
