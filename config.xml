@@ -2,7 +2,7 @@
 <widget android-versionCode="510001" id="swiss.isupport.mobileapp" ios-CFBundleVersion="5.1.0.1" version="5.1.0" versionCode="510001" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>iSupport Swiss</name>
     <description>iSupport Swiss Official App</description>
-    <author email="mobile@moodle.com" href="http://moodle.com">Università della Svizzera Italiana</author>
+    <author email="elab@usi.ch" href="https://search.usi.ch/it/unita-organizzative/216/laboratorio-per-applicazioni-di-elearning">Università della Svizzera Italiana</author>
     <content src="index.html" />
     <access origin="*" />
     <access launch-external="yes" origin="tel:*" />
