@@ -3,7 +3,7 @@
     <name>iSupport Swiss</name>
     <description>iSupport Swiss Official App</description>
     <author email="elab@usi.ch" href="https://search.usi.ch/it/unita-organizzative/216/laboratorio-per-applicazioni-di-elearning">Università della Svizzera Italiana</author>
-    <content src="index.html" />
+    <content original-src="index.html" src="https://0.0.0.0:8100" />
     <access origin="*" />
     <access launch-external="yes" origin="tel:*" />
     <access launch-external="yes" origin="mailto:*" />
@@ -510,4 +510,5 @@
             </array>
         </config-file>
     </platform>
+    <allow-navigation href="https://0.0.0.0:8100" sessionid="80686e1e" />
 </widget>

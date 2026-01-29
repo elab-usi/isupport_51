@@ -1,8 +1,14 @@
 {
-  "name": "moodlemobile",
+  "name": "swiss.isupport.mobileapp",
   "integrations": {
     "cordova": {}
   },
+  "proxies":[
+    {
+      "path": "/10.61.160.62",
+      "proxyUrl":"http://10.61.160.62:PORT"
+    }
+  ],
   "type": "angular",
   "hooks": {
     "build:before": "./scripts/copy-assets.js",
