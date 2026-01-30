@@ -18,6 +18,8 @@ import { buildTabMainRoutes } from '@features/mainmenu/mainmenu-tab-routing.modu
 import { CoreCoursesHelper } from './services/courses-helper';
 import { CORE_COURSES_MYCOURSES_PAGE_NAME } from './constants';
 
+import { AddonBlockSurveyComponentsModule } from '@addons/block/survey/components/components.module';
+
 /**
  * Build module routes.
  *
@@ -62,5 +64,8 @@ function buildRoutes(injector: Injector): Routes {
             useFactory: buildRoutes,
         },
     ],
+    imports: [
+        AddonBlockSurveyComponentsModule
+    ]
 })
 export default class CoreCoursesLazyModule {}

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, OnDestroy, OnInit, signal, viewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, viewChild, viewChildren } from '@angular/core';
 
 import { CoreCourses } from '../../services/courses';
 import { CoreEventObserver, CoreEvents } from '@singletons/events';
@@ -31,6 +31,8 @@ import { CoreBlockSideBlocksButtonComponent } from '../../../block/components/si
 import { CoreSharedModule } from '@/core/shared.module';
 import { CORE_BLOCKS_DASHBOARD_FALLBACK_BLOCKS } from '@features/block/constants';
 
+import { AddonBlockSurveyComponent } from '@addons/block/survey/components/survey/survey';
+
 /**
  * Page that displays the dashboard page.
  */
@@ -41,11 +43,13 @@ import { CORE_BLOCKS_DASHBOARD_FALLBACK_BLOCKS } from '@features/block/constants
         CoreSharedModule,
         CoreBlockComponent,
         CoreBlockSideBlocksButtonComponent,
+        AddonBlockSurveyComponent
     ],
 })
 export default class CoreCoursesDashboardPage implements OnInit, OnDestroy {
 
     readonly blocksComponents = viewChildren(CoreBlockComponent);
+    // readonly addonBlockSurveyComponent = viewChild(AddonBlockSurveyComponent);
 
     hasMainBlocks = false;
     hasSideBlocks = false;
