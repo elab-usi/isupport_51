@@ -36,6 +36,7 @@ import { EventsService } from '../events.service';
 })
 
 export class QuestionnairePage implements OnDestroy {
+
     private readonly navCtrl = inject(NavController);
     private readonly sitesProvider = inject(CoreSitesProvider);
     private readonly appProvider = inject(CoreAppProvider);
