@@ -27,11 +27,11 @@ import { IonicModule } from '@ionic/angular';
         TranslateModule.forChild(),
         CoreComponentsModule,
         CoreDirectivesModule,
-        AddonBlockSurveyComponent
+        AddonBlockSurveyComponent,
     ],
     providers: [],
     exports: [AddonBlockSurveyComponent],
     // entryComponents: [AddonBlockSurveyComponent],
 })
 
-export class AddonBlockSurveyComponentsModule {}
+export class AddonBlockSurveyComponentsModule { }

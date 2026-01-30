@@ -15,12 +15,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
 import { QuestionnairePageRoutingModule } from './questionnaire-routing.module';
-
-import { QuestionnairePage } from './questionnaire.page';
 import { TranslateModule } from '@ngx-translate/core';
 import { CoreDirectivesModule } from '@directives/directives.module';
 import { CoreComponentsModule } from '@components/components.module';
@@ -39,4 +35,4 @@ import { CoreComponentsModule } from '@components/components.module';
         TranslateModule,
     ],
 })
-export class QuestionnairePageModule {}
+export class QuestionnairePageModule { }

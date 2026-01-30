@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { provideAppInitializer, NgModule } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { CoreBlockDelegate } from '@features/block/services/block-delegate';
@@ -28,13 +28,9 @@ import { CommonModule } from '@angular/common';
         TranslateModule.forChild(),
     ],
     providers: [
-        {
-            provide: APP_INITIALIZER,
-            multi: true,
-            useValue: () => {
-                CoreBlockDelegate.registerHandler(AddonBlockSurveyHandler.instance);
-            },
-        },
+        provideAppInitializer(() => {
+            CoreBlockDelegate.registerHandler(AddonBlockSurveyHandler.instance);
+        }),
     ],
 })
-export class AddonBlockSurveyModule {}
+export class AddonBlockSurveyModule { }
