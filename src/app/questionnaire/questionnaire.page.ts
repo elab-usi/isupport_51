@@ -34,6 +34,7 @@ import { EventsService } from '../events.service';
         TranslateModule,
     ],
 })
+
 export class QuestionnairePage implements OnDestroy {
     private readonly navCtrl = inject(NavController);
     private readonly sitesProvider = inject(CoreSitesProvider);
@@ -52,11 +53,7 @@ export class QuestionnairePage implements OnDestroy {
     userId = null;
     protected onlineObserver: any;
 
-    // navParams = new NavParams();
-    // //   network = new Network();
-
-    constructor(
-    ) {
+    constructor() {
         this.getSurveyQuestions();
         this.getUserId();
 

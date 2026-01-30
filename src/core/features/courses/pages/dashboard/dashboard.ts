@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, OnDestroy, OnInit, signal, viewChild, viewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, viewChildren } from '@angular/core';
 
 import { CoreCourses } from '../../services/courses';
 import { CoreEventObserver, CoreEvents } from '@singletons/events';
@@ -43,7 +43,7 @@ import { AddonBlockSurveyComponent } from '@addons/block/survey/components/surve
         CoreSharedModule,
         CoreBlockComponent,
         CoreBlockSideBlocksButtonComponent,
-        AddonBlockSurveyComponent
+        AddonBlockSurveyComponent,
     ],
 })
 export default class CoreCoursesDashboardPage implements OnInit, OnDestroy {
@@ -178,7 +178,7 @@ export default class CoreCoursesDashboardPage implements OnInit, OnDestroy {
      * Go to search courses.
      */
     async openSearch(): Promise<void> {
-        CoreNavigator.navigateToSitePath('/courses/list', { params : { mode: 'search' } });
+        CoreNavigator.navigateToSitePath('/courses/list', { params: { mode: 'search' } });
     }
 
     /**

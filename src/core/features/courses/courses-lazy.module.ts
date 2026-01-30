@@ -65,7 +65,7 @@ function buildRoutes(injector: Injector): Routes {
         },
     ],
     imports: [
-        AddonBlockSurveyComponentsModule
+        AddonBlockSurveyComponentsModule,
     ]
 })
-export default class CoreCoursesLazyModule {}
+export default class CoreCoursesLazyModule { }

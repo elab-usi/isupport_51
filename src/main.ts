@@ -68,7 +68,7 @@ bootstrapApplication(AppComponent, {
             CoreModule,
             AddonsModule,
             TestingModule,
-            QuestionnairePageModule
+            QuestionnairePageModule,
         ),
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         provideAppInitializer(() => {
