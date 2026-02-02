@@ -39,6 +39,7 @@ import { CoreSharedModule } from '@/core/shared.module';
 import { CoreSiteLogoComponent } from '../../../../components/site-logo/site-logo';
 import { CoreLoginExceededAttemptsComponent } from '../../components/exceeded-attempts/exceeded-attempts';
 import { CoreLoginIdentityProviderComponent } from '../../components/identity-provider/identity-provider';
+import { CoreLangProvider } from '@services/lang';
 
 /**
  * Page to enter the user password to reconnect to a site.
@@ -85,6 +86,7 @@ export default class CoreLoginReconnectPage implements OnInit, OnDestroy {
     protected alwaysShowLoginFormObserver?: CoreEventObserver;
     protected loginObserver?: CoreEventObserver;
     protected fb = inject(FormBuilder);
+    protected langProvider = inject(CoreLangProvider);
 
     constructor() {
         const currentSite = CoreSites.getCurrentSite();
@@ -134,6 +136,20 @@ export default class CoreLoginReconnectPage implements OnInit, OnDestroy {
 
             if (!this.site.infos) {
                 throw new CoreError('Invalid site');
+            }
+
+            if (this.site.siteUrl.includes('it.isupport.swiss')) {
+                this.langProvider.changeCurrentLanguage('it').finally(() => {
+                    CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'it');
+                });
+            } else if (this.site.siteUrl.includes('de.isupport.swiss')) {
+                this.langProvider.changeCurrentLanguage('de').finally(() => {
+                    CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'de');
+                });
+            } else if (this.site.siteUrl.includes('fr.isupport.swiss')) {
+                this.langProvider.changeCurrentLanguage('fr').finally(() => {
+                    CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'fr');
+                });
             }
 
             this.siteInfo = {

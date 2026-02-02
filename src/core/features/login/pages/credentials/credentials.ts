@@ -46,6 +46,7 @@ import { CoreLoginMethodsComponent } from '../../components/login-methods/login-
 import { CoreLoginExceededAttemptsComponent } from '../../components/exceeded-attempts/exceeded-attempts';
 import { CoreSiteLogoComponent } from '../../../../components/site-logo/site-logo';
 import { CoreSharedModule } from '@/core/shared.module';
+import { CoreLangProvider } from '@services/lang';
 
 /**
  * Page to enter the user credentials.
@@ -89,6 +90,7 @@ export default class CoreLoginCredentialsPage implements OnInit, OnDestroy {
     protected alwaysShowLoginFormObserver?: CoreEventObserver;
     protected loginObserver?: CoreEventObserver;
     protected fb = inject(FormBuilder);
+    protected langProvider = inject(CoreLangProvider);
 
     constructor() {
         // Listen to LOGIN event to determine if login was successful, since the login can be done using QR, SSO, etc.
@@ -125,6 +127,20 @@ export default class CoreLoginCredentialsPage implements OnInit, OnDestroy {
         });
 
         await this.checkSite();
+
+        if (this.site.siteUrl.includes('it.isupport.swiss')) {
+            this.langProvider.changeCurrentLanguage('it').finally(() => {
+                CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'it');
+            });
+        } else if (this.site.siteUrl.includes('de.isupport.swiss')) {
+            this.langProvider.changeCurrentLanguage('de').finally(() => {
+                CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'de');
+            });
+        } else if (this.site.siteUrl.includes('fr.isupport.swiss')) {
+            this.langProvider.changeCurrentLanguage('fr').finally(() => {
+                CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'fr');
+            });
+        }
 
         if (this.isBrowserSSO && CoreLoginHelper.shouldSkipCredentialsScreenOnSSO()) {
             const launchedWithTokenURL = await CoreCustomURLSchemes.appLaunchedWithTokenURL();
