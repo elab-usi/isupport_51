@@ -49,7 +49,7 @@ import { AddonBlockSurveyComponent } from '@addons/block/survey/components/surve
 export default class CoreCoursesDashboardPage implements OnInit, OnDestroy {
 
     readonly blocksComponents = viewChildren(CoreBlockComponent);
-    // readonly addonBlockSurveyComponent = viewChild(AddonBlockSurveyComponent);
+    readonly addonBlockSurveyComponent = viewChildren(AddonBlockSurveyComponent);
 
     hasMainBlocks = false;
     hasSideBlocks = false;
@@ -156,6 +156,8 @@ export default class CoreCoursesDashboardPage implements OnInit, OnDestroy {
         const promises: Promise<void>[] = [];
 
         promises.push(CoreCoursesDashboard.invalidateDashboardBlocks());
+
+        this.addonBlockSurveyComponent()?.forEach((component) => component.refreshTimeline?.());
 
         // Invalidate the blocks.
         this.blocksComponents()?.forEach((blockComponent) => {

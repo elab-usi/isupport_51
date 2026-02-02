@@ -378,7 +378,7 @@ export class AddonBlockSurveyComponent
     }
 
     openQuestionnaire(): void {
-        CoreNavigator.navigate('/questionnaire');
+        CoreNavigator.navigate('/questionnaire', { params: { userId: this.userId } });
     }
 
     /**

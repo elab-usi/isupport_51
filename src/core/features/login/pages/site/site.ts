@@ -53,6 +53,9 @@ import { CoreCountries } from '@singletons/countries';
 import { CoreAlerts } from '@services/overlays/alerts';
 import { CoreSharedModule } from '@/core/shared.module';
 
+import { CoreLangProvider } from '@services/lang';
+import { CoreEvents } from '@singletons/events';
+
 /**
  * Site (url) chooser when adding a new site.
  */
@@ -84,6 +87,7 @@ export default class CoreLoginSitePage implements OnInit {
     appName = CoreConstants.CONFIG.appname;
 
     protected formBuilder = inject(FormBuilder);
+    protected langProvider = inject(CoreLangProvider);
 
     /**
      * @inheritdoc
@@ -131,6 +135,22 @@ export default class CoreLoginSitePage implements OnInit {
             siteUrl: [url, this.moodleUrlValidator()],
         });
 
+        if (url) {
+            if (url.includes('it.isupport.swiss')) {
+                this.langProvider.changeCurrentLanguage('it').finally(() => {
+                    CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'it');
+                });
+            } else if (url.includes('de.isupport.swiss')) {
+                this.langProvider.changeCurrentLanguage('de').finally(() => {
+                    CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'de');
+                });
+            } else if (url.includes('fr.isupport.swiss')) {
+                this.langProvider.changeCurrentLanguage('fr').finally(() => {
+                    CoreEvents.trigger(CoreEvents.LANGUAGE_CHANGED, 'fr');
+                });
+            }
+        }
+
         this.searchFunction = CoreUtils.debounce(async (search: string) => {
             search = search.trim();
 
@@ -139,7 +159,7 @@ export default class CoreLoginSitePage implements OnInit {
                 const sites = await CoreSites.findSites(search);
 
                 // Add UI tweaks.
-                this.sites = this.extendCoreLoginSiteInfo(<CoreLoginSiteInfoExtended[]> sites);
+                this.sites = this.extendCoreLoginSiteInfo(<CoreLoginSiteInfoExtended[]>sites);
 
                 this.hasSites = !!this.sites.length;
             } else {
@@ -160,7 +180,7 @@ export default class CoreLoginSitePage implements OnInit {
      */
     protected async initSiteSelector(): Promise<string> {
         const availableSites = await CoreLoginHelper.getAvailableSites();
-        this.fixedSites = this.extendCoreLoginSiteInfo(<CoreLoginSiteInfoExtended[]> availableSites);
+        this.fixedSites = this.extendCoreLoginSiteInfo(<CoreLoginSiteInfoExtended[]>availableSites);
         this.siteSelector = 'list'; // In case it's not defined
 
         // Do not show images if none are set.

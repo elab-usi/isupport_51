@@ -16,7 +16,7 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, NgZone, OnDestroy, inject } from '@angular/core';
-import { IonicModule, NavController, NavParams } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { CoreAppProvider } from '@services/app';
 import { CoreNavigator } from '@services/navigator';
@@ -42,7 +42,6 @@ export class QuestionnairePage implements OnDestroy {
     private readonly appProvider = inject(CoreAppProvider);
     private readonly eventsService = inject(EventsService);
     private readonly zone = inject(NgZone);
-    private readonly navParams = inject(NavParams);
 
     questions = [];
     surveyDone = false;
@@ -51,7 +50,7 @@ export class QuestionnairePage implements OnDestroy {
     answeredAll = false;
     answeredMessage = false;
 
-    userId = null;
+    userId: number | string | null = null;
     protected onlineObserver: any;
 
     constructor() {
@@ -73,9 +72,8 @@ export class QuestionnairePage implements OnDestroy {
      * Get the id of the currently logged in user.
      */
     getUserId(): void {
-        this.userId =
-            this.navParams.get('userId')! ||
-            this.sitesProvider.getCurrentSite()?.getUserId();
+        const routeUserId = CoreNavigator.getRouteParam('userId');
+        this.userId = routeUserId ?? this.sitesProvider.getCurrentSite()?.getUserId() ?? null;
     }
 
     /**

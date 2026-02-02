@@ -25,8 +25,6 @@ import {
     DefaultExport,
 } from '@angular/router';
 import { Observable } from 'rxjs';
-
-import { QuestionnairePage } from './questionnaire/questionnaire.page';
 import { TranslateModule } from '@ngx-translate/core';
 
 const modulesRoutes: WeakMap<InjectionToken<unknown>, ModuleRoutes> = new WeakMap();
@@ -110,11 +108,11 @@ function buildConditionalUrlMatcher(pathOrMatcher: string | UrlMatcher, conditio
 export type LazyRoutesModule = Type<any> |
     Routes |
     Observable<Type<any> | // eslint-disable-line @typescript-eslint/no-explicit-any
-    Routes |
-    DefaultExport<Type<any>> | // eslint-disable-line @typescript-eslint/no-explicit-any
-    DefaultExport<Routes>> |
+        Routes |
+        DefaultExport<Type<any>> | // eslint-disable-line @typescript-eslint/no-explicit-any
+        DefaultExport<Routes>> |
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Promise<Type<any> | Routes | DefaultExport<Type<any>> |DefaultExport<Routes>>;
+    Promise<Type<any> | Routes | DefaultExport<Type<any>> | DefaultExport<Routes>>;
 
 /**
  * Type to declare lazy standalone component. Extracted from Angular's LoadComponent type with default class.
@@ -238,13 +236,6 @@ export function resolveModuleRoutes(injector: Injector, token: InjectionToken<Mo
 
 export const APP_ROUTES = new InjectionToken('APP_ROUTES');
 
-const routes: Routes = [
-    {
-        path: 'questionnaire',
-        component: QuestionnairePage,
-    },
-];
-
 /**
  * Module used to register routes at the root of the application.
  */
@@ -252,7 +243,6 @@ const routes: Routes = [
     imports: [
         RouterModule.forRoot([]),
         TranslateModule,
-        RouterModule.forChild(routes),
     ],
     providers: [
         { provide: ROUTES, multi: true, useFactory: buildAppRoutes, deps: [Injector] },
