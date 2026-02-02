@@ -88,7 +88,6 @@ export default class CoreLoginSitePage implements OnInit {
 
     protected formBuilder = inject(FormBuilder);
     protected langProvider = inject(CoreLangProvider);
-    protected events = inject(CoreEvents);
 
     /**
      * @inheritdoc
