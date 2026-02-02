@@ -104,7 +104,7 @@ export class CoreMainMenuUserMenuComponent implements OnInit, OnDestroy {
 
                 // Only update handlers if they have changed, to prevent a blink effect.
                 if (newHandlers.length !== this.handlers.length ||
-                        JSON.stringify(newHandlers) !== JSON.stringify(this.handlers)) {
+                    JSON.stringify(newHandlers) !== JSON.stringify(this.handlers)) {
                     this.handlers = newHandlers;
                 }
 
@@ -114,7 +114,7 @@ export class CoreMainMenuUserMenuComponent implements OnInit, OnDestroy {
 
                 // Only update handlers if they have changed, to prevent a blink effect.
                 if (newHandlers.length !== this.accountHandlers.length ||
-                        JSON.stringify(newHandlers) !== JSON.stringify(this.accountHandlers)) {
+                    JSON.stringify(newHandlers) !== JSON.stringify(this.accountHandlers)) {
                     this.accountHandlers = newHandlers;
                 }
 
@@ -248,6 +248,13 @@ export class CoreMainMenuUserMenuComponent implements OnInit, OnDestroy {
         event.stopPropagation();
 
         await ModalController.dismiss();
+    }
+
+    /**
+     * Opens the account deletion page
+     */
+    openDeletionPage(): void {
+        window.open(this.siteUrl + '/admin/tool/dataprivacy/createdatarequest.php?type=2', '_system', 'location=yes');
     }
 
     /**
