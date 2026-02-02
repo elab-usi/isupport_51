@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, OnDestroy, OnInit, signal, viewChild, viewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, viewChildren } from '@angular/core';
 
 import { CoreCourses } from '../../services/courses';
 import { CoreEventObserver, CoreEvents } from '@singletons/events';

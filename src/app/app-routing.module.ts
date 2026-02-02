@@ -25,8 +25,6 @@ import {
     DefaultExport,
 } from '@angular/router';
 import { Observable } from 'rxjs';
-
-import { QuestionnairePage } from './questionnaire/questionnaire.page';
 import { TranslateModule } from '@ngx-translate/core';
 
 const modulesRoutes: WeakMap<InjectionToken<unknown>, ModuleRoutes> = new WeakMap();
@@ -244,7 +242,7 @@ export const APP_ROUTES = new InjectionToken('APP_ROUTES');
 @NgModule({
     imports: [
         RouterModule.forRoot([]),
-        TranslateModule
+        TranslateModule,
     ],
     providers: [
         { provide: ROUTES, multi: true, useFactory: buildAppRoutes, deps: [Injector] },
