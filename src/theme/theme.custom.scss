@@ -821,6 +821,7 @@ html,
 
     page-core-login-site {
         --core-login-background: url(../assets/img/login/isupport-login-bg.jpg);
+        height: 100% !important;
 
         core-loading {
             --core-login-background: transparent;
@@ -867,6 +868,8 @@ html,
 
     page-core-login-credentials,
     page-core-login-reconnect {
+        height: 100% !important;
+
         core-loading {
             display: flex;
             flex-direction: column;
